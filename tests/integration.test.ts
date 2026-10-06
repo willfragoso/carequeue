@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { applyMigrations } from "../src/migrations.js";
 import { setTimeout as delay } from "node:timers/promises";
 import { beforeAll, afterAll, beforeEach, describe, it, expect } from "vitest";
 import request from "supertest";
@@ -27,12 +27,7 @@ beforeAll(async () => {
     throw new Error(
       "Set ALLOW_DESTRUCTIVE_TESTS=true only with disposable test services",
     );
-  await pool.query(
-    await readFile(
-      new URL("../migrations/001_init.sql", import.meta.url),
-      "utf8",
-    ),
-  );
+  await applyMigrations(pool, new URL("../migrations/", import.meta.url));
   broker = await connectBroker();
 }, 20000);
 beforeEach(async () => {

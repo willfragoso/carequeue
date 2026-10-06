@@ -47,7 +47,7 @@ docker compose stop
 docker compose down
 ```
 
-PostgreSQL is exposed on localhost:55432 to avoid conflicts with existing installations. Compose has explicit local demo credentials, loopback-only published ports and persistent dependency volumes. It runs a one-shot, transactional schema bootstrap before application processes. API startup does **not** depend on RabbitMQ health. Publisher and worker reconnect every second after a connection failure. Management UI: http://localhost:15672 (carequeue / local_demo_only).
+PostgreSQL is exposed on localhost:55432 to avoid conflicts with existing installations. Compose has explicit local demo credentials, loopback-only published ports and persistent dependency volumes. It runs a versioned, transactional migration runner before application processes. API startup does **not** depend on RabbitMQ health. Publisher and worker reconnect every second after a connection failure. Management UI: http://localhost:15672 (carequeue / local_demo_only).
 
 For host development, install Node 24 and pnpm 11.19.0, then:
 
@@ -191,7 +191,7 @@ There is still one notification; worker logs show duplicate_detected. Replay is 
 - Classic durable queues with TTL dead-letter routing are sufficient to demonstrate broker outages and worker interruption. Classic queue dead-letter forwarding can lose a message if its target is unavailable; a production cluster should use quorum queues and at-least-once dead-lettering, policies and operational monitoring. This demo makes no guarantee against broker disk loss or cluster failure.
 - Retry counters bound normal processing failures. Ambiguous confirmations and redelivery can create extra physical attempts; database idempotency prevents repeated notification effects.
 - Offset pagination can shift under concurrent inserts; no total count is promised. History/notification collections are small and unpaginated.
-- No event retention, DLQ replay service, exponential backoff, HTTP create idempotency key, or production migration framework. The initial schema is transactional and repeatable; future schema revisions need versioned migrations.
+- No event retention, DLQ replay service, exponential backoff, or HTTP create idempotency key. Forward-only SQL migrations run under an advisory lock; pending SQL and bookkeeping commit together. Applied files cannot be edited or removed: SHA-256 checksums detect drift. Add a new numbered SQL file for changes. The existing initial schema can be adopted without deleting data because 001_init.sql uses IF NOT EXISTS. There is no automatic down migration.
 - Readiness tests connectivity, not schema version. Schema bootstrap runs before API in Compose. All processes must restart after environment changes. Changing retry TTL requires recreating the existing retry queue.
 - Logs intentionally suppress exception text; safe structured codes identify failures. Production would add metrics, alerts and traces.
 - Image tags follow supported minor/major lines rather than immutable digests. Review image updates and supply-chain requirements before production reuse.
