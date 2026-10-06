@@ -7,7 +7,7 @@ CareQueue solves a common operational problem: teams need to accept a request im
 The demo has two faces:
 
 - A case queue for the fictional support flow: **OPEN → TRIAGE → ASSIGNED → RESOLVED**.
-- A reliability console that makes the outbox, broker recovery, retries, dead-letter queue and duplicate-event protection visible.
+- An architecture and observability console that makes the outbox, broker recovery, retries, dead-letter queue and duplicate-event protection visible.
 
 All examples are fictional. Do not enter personal or patient data. Skipping, reversing, and repeating a status returns HTTP 409. Only creation emits an event; status changes remain synchronous.
 
@@ -224,9 +224,9 @@ GET /api/cases?pagination=cursor&pageSize=20 returns pagination.nextCursor. Supp
 
 The React + Vite + TypeScript console is available at **http://localhost:8080** after `docker compose up --build -d`. It shares the API origin through an Nginx proxy; the browser receives no database/broker credentials. All displayed delivery states and queue counts come from API responses, not timers or mock data.
 
-- **Solicitações**: create synthetic cases, filter and traverse with cursor pagination, advance only adjacent statuses, inspect history and notification delivery.
-- **Confiabilidade**: read pending outbox/queue/DLQ counts and follow a stop/create/restart/replay walkthrough.
-- eventId and correlationId are visible and copyable. HTTP failures include their correlation ID.
+- **Solicitações**: product view for synthetic cases, filtering, cursor pagination, adjacent status transitions and status history.
+- **Arquitetura**: technical view for pending outbox events, RabbitMQ status, retry queues, DLQ counts and the stop/create/restart/replay walkthrough.
+- eventId, correlationId and notification delivery are visible in the architecture view. HTTP failures include their correlation ID.
 - Polling runs every three seconds without overlapping requests; changing selection/filter cancels obsolete requests. Network failures show unavailable data rather than invented zero counts.
 
 For frontend development with the API running:
@@ -257,7 +257,7 @@ Actual failure demonstration through the UI:
 1. Run `docker compose stop rabbitmq`.
 2. Create a case in the console: it persists and shows pendingPublication.
 3. Run `docker compose start rabbitmq`: the publisher and worker reconnect; the UI moves to a saved notification.
-4. Replay its eventId twice using the command shown in Confiabilidade. Its notification count remains one.
+4. Replay its eventId twice using the command shown in Arquitetura. Its notification count remains one.
 
 [Broker outage screenshot](docs/frontend-outage.png) · [Recovered delivery screenshot](docs/frontend-recovery.png)
 
