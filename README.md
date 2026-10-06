@@ -33,8 +33,8 @@ Three processes share one database and codebase. This is intentionally a small a
 Requires Docker Compose v2. Clone the public repository and enter its directory:
 
 ```sh
-git clone https://github.com/willfragoso/carequeue-api.git
-cd carequeue-api
+git clone https://github.com/willfragoso/carequeue.git
+cd carequeue
 ```
 
 The Compose project name is fixed to `carequeue`, so moving the checkout preserves the same local containers and volumes. Start everything:
@@ -57,11 +57,11 @@ pnpm install --frozen-lockfile
 cp .env.example .env
 docker compose up -d postgres rabbitmq
 pnpm build
-node --env-file=.env dist/src/migrate.js
-node --env-file=.env dist/src/api.js
+node --env-file=.env apps/api/dist/src/migrate.js
+node --env-file=.env apps/api/dist/src/api.js
 # In separate terminals:
-node --env-file=.env dist/src/publisher.js
-node --env-file=.env dist/src/worker.js
+node --env-file=.env apps/api/dist/src/publisher.js
+node --env-file=.env apps/api/dist/src/worker.js
 ```
 
 On PowerShell use `Copy-Item .env.example .env`. The application validates environment variables at startup. Scripts `pnpm start`, `pnpm publisher`, `pnpm worker` and `pnpm migrate` expect variables to be set in the shell; they do not implicitly load .env.
@@ -260,14 +260,24 @@ Actual failure demonstration through the UI:
 
 These are real successive changes, with separate commits and dependent pull requests. No branch has been merged. Review and merge in order, retargeting the next PR after its prerequisite is merged:
 
-| PR                                                        | Problem addressed                               | Evidence                                            |
-| --------------------------------------------------------- | ----------------------------------------------- | --------------------------------------------------- |
-| [#1](https://github.com/willfragoso/carequeue-api/pull/1) | Untracked schema bootstrap                      | Concurrent runners, checksum drift, atomic rollback |
-| [#2](https://github.com/willfragoso/carequeue-api/pull/2) | Delivery difficult to inspect                   | State progression and broker-unavailable snapshots  |
-| [#3](https://github.com/willfragoso/carequeue-api/pull/3) | Retries use the same fixed delay                | Real broker TTL timing and bounded DLQ              |
-| [#4](https://github.com/willfragoso/carequeue-api/pull/4) | Offset pages shift on inserts                   | Concurrent inserts and microsecond precision        |
-| [#5](https://github.com/willfragoso/carequeue-api/pull/5) | Demonstration required terminal-only inspection | Real browser workflow, errors and mobile viewport   |
+| PR                                                    | Problem addressed                               | Evidence                                            |
+| ----------------------------------------------------- | ----------------------------------------------- | --------------------------------------------------- |
+| [#1](https://github.com/willfragoso/carequeue/pull/1) | Untracked schema bootstrap                      | Concurrent runners, checksum drift, atomic rollback |
+| [#2](https://github.com/willfragoso/carequeue/pull/2) | Delivery difficult to inspect                   | State progression and broker-unavailable snapshots  |
+| [#3](https://github.com/willfragoso/carequeue/pull/3) | Retries use the same fixed delay                | Real broker TTL timing and bounded DLQ              |
+| [#4](https://github.com/willfragoso/carequeue/pull/4) | Offset pages shift on inserts                   | Concurrent inserts and microsecond precision        |
+| [#5](https://github.com/willfragoso/carequeue/pull/5) | Demonstration required terminal-only inspection | Real browser workflow, errors and mobile viewport   |
 
 The four backend PRs passed GitHub Actions. Local frontend verification passed three browser tests on Chrome, types, lint and production build. A case created in the UI with RabbitMQ stopped was later notified after recovery; two replays still left exactly one database notification. Existing data was preserved when adopting all three versioned migrations.
 
 Known frontend limitations: no login, no control of Docker from the browser, no per-event retry/DLQ tracing, no historical metrics, and no push updates (polling is used). The console is intended for a local synthetic demonstration.
+
+## Workspace organization and protected main
+
+The project is a pnpm workspace: apps/api owns Express, PostgreSQL, RabbitMQ, migrations and backend tests; apps/web owns React, Vite and browser assets. Each application has its own package.json, dependencies and build. The root keeps orchestration, E2E tests, lint/format tooling and one lockfile. Docker deploys only the API package and its production dependencies, so frontend dependencies do not enter the API image.
+
+Root commands remain pnpm build, pnpm typecheck, pnpm lint, pnpm test and pnpm test:integration. Use pnpm --filter @carequeue/api build or pnpm --filter @carequeue/web build to build one application. Backend compiled entrypoints on the host are now under apps/api/dist/src; container entrypoints remain /app/dist/src.
+
+The GitHub repository is now willfragoso/carequeue. Existing carequeue-api links redirect; the existing local checkout directory may retain its name. The default main branch contains the initial stable API commit. Pending evolution PRs have not been merged: PR #1 targets main, and subsequent PRs retain their dependency chain. The workspace PR follows the frontend PR.
+
+Main requires pull requests, an up-to-date successful checks job and resolved conversations, including for administrators. Force pushes and deletion are disabled. No second-person approval is required for this individual portfolio project. Only checks is required initially because early PRs do not yet define e2e; require the e2e job as well after the frontend workflow is integrated.
