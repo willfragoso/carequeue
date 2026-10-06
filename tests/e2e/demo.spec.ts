@@ -4,7 +4,9 @@ test("creates a synthetic case, advances triage and traces its notification", as
 }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Cada solicitação, uma jornada." }),
+    page.getByRole("heading", {
+      name: "Da entrada à resolução, sem perder o rastro.",
+    }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Nova solicitação", exact: true })

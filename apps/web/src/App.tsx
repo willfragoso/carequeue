@@ -602,7 +602,7 @@ export function App() {
             C<span />
           </span>
           <div>
-            CareQueue<small>CONSOLE DE DEMONSTRAÇÃO</small>
+            CareQueue<small>FILA DE ATENDIMENTO</small>
           </div>
         </a>
         <div className="workspace-tag">
@@ -629,12 +629,12 @@ export function App() {
           <span>◈</span>
           <strong>Somente dados sintéticos</strong>
           <p>
-            Um fluxo fictício de triagem. Nenhuma mensagem é enviada para
-            pessoas ou serviços externos.
+            Uma fila fictícia para aceitar solicitações, acompanhar triagem e
+            demonstrar entrega confiável.
           </p>
         </div>
         <div className="sidebar-footer">
-          PORTFÓLIO BACKEND<span>Node.js · PostgreSQL · RabbitMQ</span>
+          PRODUTO FICTÍCIO<span>Node.js · PostgreSQL · RabbitMQ</span>
         </div>
       </aside>
       <main>
@@ -655,13 +655,13 @@ export function App() {
               <span className="eyebrow">TRIAGEM & ACOMPANHAMENTO</span>
               <h1>
                 {view === "cases"
-                  ? "Cada solicitação, uma jornada."
-                  : "Confiabilidade que você pode observar."}
+                  ? "Da entrada à resolução, sem perder o rastro."
+                  : "Quando o broker falha, a fila continua."}
               </h1>
               <p>
                 {view === "cases"
-                  ? "Crie, acompanhe e veja a entrega acontecer, do primeiro registro à notificação."
-                  : "Interrompa o broker, acompanhe a recuperação e comprove a idempotência."}
+                  ? "CareQueue registra solicitações fictícias, guia a triagem e mostra o histórico de cada mudança."
+                  : "Pare o RabbitMQ, crie uma solicitação e veja a outbox publicar o evento quando o broker voltar."}
               </p>
             </div>
             <button
@@ -691,7 +691,7 @@ export function App() {
                 <div className="panel-heading">
                   <div>
                     <h2>Solicitações</h2>
-                    <p>Uma fila organizada, do início ao fim.</p>
+                    <p>A operação em andamento, com status e histórico.</p>
                   </div>
                   <label className="filter-label">
                     Status
@@ -758,7 +758,7 @@ export function App() {
                     <h3>
                       {filter
                         ? "Nenhuma solicitação neste status"
-                        : "A fila começa com uma solicitação"}
+                        : "A operação começa com uma solicitação"}
                     </h3>
                     <p>Crie um exemplo sintético para explorar o fluxo.</p>
                     <button
@@ -814,8 +814,8 @@ export function App() {
               ) : (
                 <aside className="panel selection-empty">
                   <span className="empty-icon">↗</span>
-                  <span className="eyebrow">DO REGISTRO À ENTREGA</span>
-                  <h2>Toda etapa deixa um rastro.</h2>
+                  <span className="eyebrow">O QUE ACONTECE POR TRÁS</span>
+                  <h2>O atendimento continua depois do clique.</h2>
                   <p>
                     Selecione uma solicitação para ver o histórico, avançar a
                     triagem e acompanhar a notificação simulada.

@@ -1,10 +1,15 @@
 # CareQueue
 
-Projeto de portfólio de backend: triagem fictícia com dados sintéticos, outbox transacional e consumo idempotente.
+CareQueue é um produto fictício para organizar solicitações de atendimento desde a entrada até a resolução. Ele mostra, com dados sintéticos, como uma operação pode registrar uma solicitação, acompanhar sua triagem e ainda manter o rastro técnico da entrega assíncrona.
 
-CareQueue is a small backend portfolio project exploring a real reliability problem: an HTTP request must survive a broker outage, and a repeated event must not repeat its database effect. All examples are fictional. Do not enter personal or patient data.
+CareQueue solves a common operational problem: teams need to accept a request immediately, keep its status visible, and trigger follow-up work even when the message broker is temporarily unavailable. The API persists the case and an outbox event in the same PostgreSQL transaction; a publisher later sends the event to RabbitMQ; a worker stores one simulated notification with an idempotency key. The result is an **at least once** delivery flow that is observable and safe against duplicate effects.
 
-Cases move through **OPEN → TRIAGE → ASSIGNED → RESOLVED**. Skipping, reversing, and repeating a status returns HTTP 409. Only creation emits an event; status changes remain synchronous.
+The demo has two faces:
+
+- A case queue for the fictional support flow: **OPEN → TRIAGE → ASSIGNED → RESOLVED**.
+- A reliability console that makes the outbox, broker recovery, retries, dead-letter queue and duplicate-event protection visible.
+
+All examples are fictional. Do not enter personal or patient data. Skipping, reversing, and repeating a status returns HTTP 409. Only creation emits an event; status changes remain synchronous.
 
 ## Stack and architecture
 
@@ -278,6 +283,6 @@ The project is a pnpm workspace: apps/api owns Express, PostgreSQL, RabbitMQ, mi
 
 Root commands remain pnpm build, pnpm typecheck, pnpm lint, pnpm test and pnpm test:integration. Use pnpm --filter @carequeue/api build or pnpm --filter @carequeue/web build to build one application. Backend compiled entrypoints on the host are now under apps/api/dist/src; container entrypoints remain /app/dist/src.
 
-The GitHub repository is now willfragoso/carequeue. Existing carequeue-api links redirect; the existing local checkout directory may retain its name. The default main branch contains the initial stable API commit. Pending evolution PRs have not been merged: PR #1 targets main, and subsequent PRs retain their dependency chain. The workspace PR follows the frontend PR.
+The GitHub repository is now willfragoso/carequeue. Existing carequeue-api links redirect; the local checkout has also been renamed to `D:\Projetos\CAREQUEUE\carequeue`. The default main branch contains the initial stable API commit. Pending evolution PRs have not been merged: PR #1 targets main, and subsequent PRs retain their dependency chain. The workspace PR follows the frontend PR.
 
 Main requires pull requests, an up-to-date successful checks job and resolved conversations, including for administrators. Force pushes and deletion are disabled. No second-person approval is required for this individual portfolio project. Only checks is required initially because early PRs do not yet define e2e; require the e2e job as well after the frontend workflow is integrated.
