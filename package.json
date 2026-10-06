@@ -16,7 +16,7 @@
     "publisher": "node dist/src/publisher.js",
     "worker": "node dist/src/worker.js",
     "migrate": "node dist/src/migrate.js",
-    "format": "prettier --write src tests *.json *.js *.yaml README.md .github/workflows/*.yml",
+    "format": "prettier --write src tests frontend *.ts *.json *.js *.yaml README.md .github/workflows/*.yml",
     "dev:frontend": "vite --config frontend/vite.config.ts",
     "test:e2e": "playwright test"
   },
