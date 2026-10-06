@@ -12,6 +12,7 @@ const { relayOne } = await import("../src/relay.js");
 const { saveNotification, handleMessage } = await import("../src/consumer.js");
 const { connectBroker, publishConfirmed, queues } =
   await import("../src/broker.js");
+const { retryQueues, retryDelay } = await import("../src/retries.js");
 const { config } = await import("../src/config.js");
 let broker: Awaited<ReturnType<typeof connectBroker>>;
 async function next(queue: string): Promise<GetMessage> {
@@ -34,7 +35,7 @@ beforeEach(async () => {
   await pool.query(
     "TRUNCATE notifications,outbox,case_history,cases RESTART IDENTITY CASCADE",
   );
-  for (const queue of Object.values(queues))
+  for (const queue of [queues.main, queues.dead, ...retryQueues()])
     await broker.channel.purgeQueue(queue);
 });
 afterAll(async () => {
@@ -148,8 +149,17 @@ describe("real PostgreSQL and RabbitMQ", () => {
         }),
       ),
     );
-    for (let attempt = 0; attempt <= config.MAX_RETRIES; attempt++)
-      await handleMessage(broker.channel, await next(queues.main));
+    let current = await next(queues.main);
+    for (let attempt = 0; attempt <= config.MAX_RETRIES; attempt++) {
+      const started = Date.now();
+      await handleMessage(broker.channel, current);
+      if (attempt < config.MAX_RETRIES) {
+        current = await next(queues.main);
+        expect(Date.now() - started).toBeGreaterThanOrEqual(
+          retryDelay(attempt + 1) * 0.8,
+        );
+      }
+    }
     const dead = await next(queues.dead);
     expect(dead.properties.headers?.["x-retry-count"]).toBe(
       config.MAX_RETRIES + 1,

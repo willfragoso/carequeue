@@ -5,6 +5,7 @@ import { eventSchema, type CaseEvent } from "./domain.js";
 import { config } from "./config.js";
 import { logger } from "./logger.js";
 import { publishConfirmed, queues } from "./broker.js";
+import { retryQueue, retryDelay } from "./retries.js";
 export async function saveNotification(event: CaseEvent) {
   const result = await pool.query(
     "INSERT INTO notifications(id,event_id,case_id) VALUES($1,$2,$3) ON CONFLICT(event_id) DO NOTHING",
@@ -48,11 +49,13 @@ export async function handleMessage(
       eventId: event?.eventId,
       correlationId: event?.correlationId,
       attempt,
+      retryDelayMs:
+        attempt < config.MAX_RETRIES ? retryDelay(attempt + 1) : null,
     });
     // Confirm the durable retry/DLQ copy before acknowledging the original.
     await publishConfirmed(
       channel,
-      attempt < config.MAX_RETRIES ? queues.retry : queues.dead,
+      attempt < config.MAX_RETRIES ? retryQueue(attempt + 1) : queues.dead,
       message.content,
       { "x-retry-count": attempt + 1 },
     );
