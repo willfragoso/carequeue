@@ -203,3 +203,9 @@ Executed locally with Node 24.19.0: frozen-lockfile installation, dependency pee
 A real broker stop/start demonstration persisted a case while RabbitMQ was stopped, left its outbox event pending, and produced one notification after recovery. Replaying the event twice still yielded one notification. API, publisher and worker exited with code 0 on graceful stop, and were restarted. Disposable test containers were removed; the local demo stack remains running.
 
 The GitHub Actions workflow is configured but has not been executed on GitHub in this session. Review the workflow, queue durability limitations and migration strategy before extending the project.
+
+## Delivery inspection
+
+GET /api/operations returns database counts, pending/published outbox totals, oldest pending age and a live RabbitMQ snapshot (ready messages, consumer count, retry queue and DLQ depth). Broker inspection uses passive queue checks: it does not create queues or consume messages. Unavailable broker counts are null, not zero. These snapshots are approximate, not historical metrics; ready counts exclude unacknowledged deliveries. The endpoint is for the unauthenticated local demonstration and should be restricted before production use.
+
+GET /api/cases/:id/delivery exposes eventId, correlationId, timestamps and the derived pendingPublication, awaitingNotification or completed state without exposing the full event payload. A worker may commit its effect before the publisher commits published_at; notification persistence takes precedence when deriving state.

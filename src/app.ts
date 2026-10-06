@@ -13,6 +13,7 @@ import {
   notifications,
   HttpError,
 } from "./cases.js";
+import { operations, delivery } from "./operations.js";
 export function createApp() {
   const app = express();
   app.disable("x-powered-by");
@@ -69,7 +70,13 @@ export function createApp() {
       .parse(req.query);
     res.json(await listCases(query.status, query.page, query.pageSize));
   });
+  app.get("/api/operations", async (_req, res) =>
+    res.json({ data: await operations() }),
+  );
   const id = (value: unknown) => z.uuid().parse(value);
+  app.get("/api/cases/:id/delivery", async (req, res) =>
+    res.json({ data: await delivery(id(req.params.id)) }),
+  );
   app.get("/api/cases/:id", async (req, res) =>
     res.json({ data: await getCase(id(req.params.id)) }),
   );
