@@ -266,7 +266,7 @@ These are real successive changes, with separate commits and dependent pull requ
 | [#2](https://github.com/willfragoso/carequeue-api/pull/2) | Delivery difficult to inspect                   | State progression and broker-unavailable snapshots  |
 | [#3](https://github.com/willfragoso/carequeue-api/pull/3) | Retries use the same fixed delay                | Real broker TTL timing and bounded DLQ              |
 | [#4](https://github.com/willfragoso/carequeue-api/pull/4) | Offset pages shift on inserts                   | Concurrent inserts and microsecond precision        |
-| Frontend PR                                               | Demonstration required terminal-only inspection | Real browser workflow, errors and mobile viewport   |
+| [#5](https://github.com/willfragoso/carequeue-api/pull/5) | Demonstration required terminal-only inspection | Real browser workflow, errors and mobile viewport   |
 
 The four backend PRs passed GitHub Actions. Local frontend verification passed three browser tests on Chrome, types, lint and production build. A case created in the UI with RabbitMQ stopped was later notified after recovery; two replays still left exactly one database notification. Existing data was preserved when adopting all three versioned migrations.
 
