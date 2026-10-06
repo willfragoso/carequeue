@@ -1,6 +1,12 @@
+import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { pool, transaction } from "./db.js";
-import { canTransition, type Status, type CaseEvent } from "./domain.js";
+import {
+  canTransition,
+  statusSchema,
+  type Status,
+  type CaseEvent,
+} from "./domain.js";
 export class HttpError extends Error {
   constructor(
     public status: number,
@@ -112,4 +118,66 @@ export async function notifications(id: string) {
       [id],
     )
   ).rows;
+}
+
+const cursorSchema = z
+  .object({
+    version: z.literal(1),
+    createdAt: z.iso.datetime(),
+    id: z.uuid(),
+    status: statusSchema.nullable(),
+  })
+  .strict();
+export async function listCasesCursor(
+  status: Status | undefined,
+  pageSize: number,
+  cursor?: string,
+) {
+  let boundary: z.infer<typeof cursorSchema> | undefined;
+  if (cursor) {
+    try {
+      boundary = cursorSchema.parse(
+        JSON.parse(Buffer.from(cursor, "base64url").toString("utf8")),
+      );
+      if (boundary.status !== (status ?? null))
+        throw new Error("Changed filter");
+    } catch {
+      throw new HttpError(
+        400,
+        "INVALID_CURSOR",
+        "Invalid cursor or changed status filter",
+      );
+    }
+  }
+  const result = await pool.query(
+    `SELECT ${columns},
+    to_char(created_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "cursorTimestamp"
+    FROM cases WHERE ($1::text IS NULL OR status=$1)
+    AND ($2::timestamptz IS NULL OR (created_at,id)<($2::timestamptz,$3::uuid))
+    ORDER BY created_at DESC,id DESC LIMIT $4`,
+    [
+      status ?? null,
+      boundary?.createdAt ?? null,
+      boundary?.id ?? null,
+      pageSize + 1,
+    ],
+  );
+  const rows = result.rows.slice(0, pageSize);
+  const last = rows.at(-1);
+  const nextCursor =
+    result.rows.length > pageSize && last
+      ? Buffer.from(
+          JSON.stringify({
+            version: 1,
+            createdAt: last.cursorTimestamp,
+            id: last.id,
+            status: status ?? null,
+          }),
+        ).toString("base64url")
+      : null;
+  const data = rows.map(({ cursorTimestamp, ...row }) => {
+    void cursorTimestamp;
+    return row;
+  });
+  return { data, pagination: { mode: "cursor", pageSize, nextCursor } };
 }
