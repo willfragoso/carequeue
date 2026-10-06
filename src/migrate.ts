@@ -1,12 +1,16 @@
-import { readFile } from "node:fs/promises";
-import { pool, transaction } from "./db.js";
-await transaction(async (client) => {
-  await client.query("SELECT pg_advisory_xact_lock(741234)");
-  await client.query(
-    await readFile(
-      new URL("../../migrations/001_init.sql", import.meta.url),
-      "utf8",
-    ),
+import { pool } from "./db.js";
+import { applyMigrations } from "./migrations.js";
+import { logger } from "./logger.js";
+
+try {
+  const applied = await applyMigrations(
+    pool,
+    new URL("../../migrations/", import.meta.url),
   );
-});
-await pool.end();
+  logger.info({ step: "migrations_complete", applied });
+} catch {
+  logger.error({ step: "migration_failure" });
+  process.exitCode = 1;
+} finally {
+  await pool.end();
+}
