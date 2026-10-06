@@ -1,6 +1,6 @@
 name: carequeue
 x-app: &app
-  build: .
+  build: { context: ., target: api }
   environment: &env
     DATABASE_URL: postgres://carequeue:local_demo_only@postgres:5432/carequeue
     RABBITMQ_URL: amqp://carequeue:local_demo_only@rabbitmq:5672
@@ -38,7 +38,7 @@ services:
       timeout: 5s
       retries: 20
   migrate:
-    build: .
+    build: { context: ., target: api }
     environment: *env
     command: ["node", "dist/src/migrate.js"]
     depends_on:
@@ -61,6 +61,13 @@ services:
   publisher:
     <<: *app
     command: ["node", "dist/src/publisher.js"]
+  frontend:
+    build: { context: ., target: frontend }
+    ports: ["127.0.0.1:8080:8080"]
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
   worker:
     <<: *app
     command: ["node", "dist/src/worker.js"]
