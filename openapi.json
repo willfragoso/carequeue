@@ -646,6 +646,185 @@
           }
         }
       }
+    },
+    "/api/operations": {
+      "get": {
+        "summary": "Read-only operational snapshot; broker downtime returns null queue counts",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "observedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "database": {
+                          "const": "available"
+                        },
+                        "cases": {
+                          "type": "integer"
+                        },
+                        "notifications": {
+                          "type": "integer"
+                        },
+                        "outbox": {
+                          "type": "object",
+                          "properties": {
+                            "pending": {
+                              "type": "integer"
+                            },
+                            "published": {
+                              "type": "integer"
+                            },
+                            "oldestPendingSeconds": {
+                              "type": ["number", "null"]
+                            }
+                          }
+                        },
+                        "broker": {
+                          "type": "object",
+                          "properties": {
+                            "status": {
+                              "enum": ["available", "unavailable"]
+                            },
+                            "ready": {
+                              "type": ["integer", "null"]
+                            },
+                            "consumers": {
+                              "type": ["integer", "null"]
+                            },
+                            "retryReady": {
+                              "type": ["integer", "null"]
+                            },
+                            "deadLetters": {
+                              "type": ["integer", "null"]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cases/{id}/delivery": {
+      "get": {
+        "summary": "Trace creation event through publication and notification persistence",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "eventId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "correlationId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "eventType": {
+                            "const": "CaseCreated.v1"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "publishedAt": {
+                            "type": ["string", "null"],
+                            "format": "date-time"
+                          },
+                          "notificationSavedAt": {
+                            "type": ["string", "null"],
+                            "format": "date-time"
+                          },
+                          "state": {
+                            "enum": [
+                              "pendingPublication",
+                              "awaitingNotification",
+                              "completed"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
