@@ -1,5 +1,6 @@
 import amqp, { type ConfirmChannel, type ChannelModel } from "amqplib";
 import { config } from "./config.js";
+import { retryDelay, retryQueue } from "./retries.js";
 export const queues = {
   main: "carequeue.case-created",
   retry: "carequeue.case-created.retry",
@@ -16,14 +17,16 @@ export async function connectBroker(): Promise<{
     channel.on("error", () => {});
     await channel.assertQueue(queues.main, { durable: true });
     await channel.assertQueue(queues.dead, { durable: true });
-    await channel.assertQueue(queues.retry, {
-      durable: true,
-      arguments: {
-        "x-message-ttl": config.RETRY_DELAY_MS,
-        "x-dead-letter-exchange": "",
-        "x-dead-letter-routing-key": queues.main,
-      },
-    });
+    for (let attempt = 1; attempt <= config.MAX_RETRIES; attempt++) {
+      await channel.assertQueue(retryQueue(attempt), {
+        durable: true,
+        arguments: {
+          "x-message-ttl": retryDelay(attempt),
+          "x-dead-letter-exchange": "",
+          "x-dead-letter-routing-key": queues.main,
+        },
+      });
+    }
     return { connection, channel };
   } catch (error) {
     await connection.close().catch(() => {});

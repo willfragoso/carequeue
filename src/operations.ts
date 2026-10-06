@@ -4,6 +4,7 @@ import { pool } from "./db.js";
 import { queues } from "./broker.js";
 import { getCase } from "./cases.js";
 
+import { retryQueues } from "./retries.js";
 export type BrokerSnapshot =
   | {
       status: "available";
@@ -30,13 +31,15 @@ export async function inspectBroker(): Promise<BrokerSnapshot> {
       const channel = await connection!.createChannel();
       channel.on("error", () => {});
       const main = await channel.checkQueue(queues.main);
-      const retry = await channel.checkQueue(queues.retry);
+      let retryReady = 0;
+      for (const queue of retryQueues())
+        retryReady += (await channel.checkQueue(queue)).messageCount;
       const dead = await channel.checkQueue(queues.dead);
       return {
         status: "available" as const,
         ready: main.messageCount,
         consumers: main.consumerCount,
-        retryReady: retry.messageCount,
+        retryReady,
         deadLetters: dead.messageCount,
       };
     };
