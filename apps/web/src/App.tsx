@@ -288,7 +288,15 @@ function DeliveryFlow({ event }: { event: Delivery | undefined }) {
     </div>
   );
 }
-function CaseDetails({ id, onChange }: { id: string; onChange: () => void }) {
+function CaseDetails({
+  id,
+  onChange,
+  showDelivery = false,
+}: {
+  id: string;
+  onChange: () => void;
+  showDelivery?: boolean;
+}) {
   const current = useRemote<Data<Case>>("/api/cases/" + id);
   const history = useRemote<Data<History[]>>("/api/cases/" + id + "/history");
   const notifications = useRemote<Data<Notification[]>>(
@@ -299,7 +307,9 @@ function CaseDetails({ id, onChange }: { id: string; onChange: () => void }) {
   );
   const [changing, setChanging] = useState(false);
   const [mutationError, setMutationError] = useState<ApiError | null>(null);
-  const [tab, setTab] = useState<"delivery" | "history">("delivery");
+  const [tab, setTab] = useState<"delivery" | "history">(
+    showDelivery ? "delivery" : "history",
+  );
   const item = current.data?.data;
   const event = delivery.data?.data[0];
   async function advance() {
@@ -377,13 +387,15 @@ function CaseDetails({ id, onChange }: { id: string; onChange: () => void }) {
         role="tablist"
         aria-label="Informações da solicitação"
       >
-        <button
-          role="tab"
-          aria-selected={tab === "delivery"}
-          onClick={() => setTab("delivery")}
-        >
-          Entrega do evento
-        </button>
+        {showDelivery && (
+          <button
+            role="tab"
+            aria-selected={tab === "delivery"}
+            onClick={() => setTab("delivery")}
+          >
+            Entrega do evento
+          </button>
+        )}
         <button
           role="tab"
           aria-selected={tab === "history"}
@@ -392,7 +404,7 @@ function CaseDetails({ id, onChange }: { id: string; onChange: () => void }) {
           Histórico <span>{history.data?.data.length ?? "—"}</span>
         </button>
       </div>
-      {tab === "delivery" ? (
+      {showDelivery && tab === "delivery" ? (
         <section role="tabpanel" aria-label="Entrega do evento">
           <DeliveryFlow event={event} />
           <ErrorNotice error={delivery.error ?? notifications.error} />
@@ -483,11 +495,11 @@ function Reliability({
   return (
     <div className="reliability-grid">
       <section className="panel demo-guide">
-        <div className="panel-kicker">DEMONSTRAÇÃO GUIADA</div>
+        <div className="panel-kicker">ARQUITETURA & OBSERVABILIDADE</div>
         <h2>Veja a fila se recuperar.</h2>
         <p className="quiet">
-          A solicitação deve continuar existindo mesmo quando o broker estiver
-          indisponível.
+          Esta tela mostra a parte técnica: outbox, RabbitMQ, retentativas,
+          dead-letter queue e idempotência do consumidor.
         </p>
         <ol className="guide-list">
           <li>
@@ -565,14 +577,19 @@ function Reliability({
           </div>
         </section>
         {selectedId ? (
-          <CaseDetails key={selectedId} id={selectedId} onChange={() => {}} />
+          <CaseDetails
+            key={selectedId}
+            id={selectedId}
+            onChange={() => {}}
+            showDelivery
+          />
         ) : (
           <section className="panel selection-empty">
             <span className="empty-icon">↗</span>
             <h2>Selecione uma solicitação</h2>
             <p>
               Na aba Solicitações, escolha um item para acompanhar a entrega
-              durante a demonstração.
+              técnica durante a demonstração.
             </p>
           </section>
         )}
@@ -581,19 +598,22 @@ function Reliability({
   );
 }
 export function App() {
-  const [view, setView] = useState<"cases" | "reliability">("cases");
+  const [view, setView] = useState<"cases" | "architecture">("cases");
   const [filter, setFilter] = useState("");
   const [cursor, setCursor] = useState<string | null>(null);
   const [previous, setPrevious] = useState<(string | null)[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showNew, setShowNew] = useState(false);
   const [notice, setNotice] = useState("");
-  const operations = useRemote<Data<Operations>>("/api/operations");
+  const operations = useRemote<Data<Operations>>(
+    view === "architecture" ? "/api/operations" : null,
+  );
   const query = new URLSearchParams({ pagination: "cursor", pageSize: "10" });
   if (filter) query.set("status", filter);
   if (cursor) query.set("cursor", cursor);
   const cases = useRemote<CaseList>("/api/cases?" + query.toString());
   const snapshot = operations.error ? null : (operations.data?.data ?? null);
+  const productAvailable = !cases.error;
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -602,7 +622,7 @@ export function App() {
             C<span />
           </span>
           <div>
-            CareQueue<small>CONSOLE DE DEMONSTRAÇÃO</small>
+            CareQueue<small>FILA DE ATENDIMENTO</small>
           </div>
         </a>
         <div className="workspace-tag">
@@ -616,36 +636,36 @@ export function App() {
             onClick={() => setView("cases")}
           >
             <span aria-hidden="true">▤</span>Solicitações
-            <span className="nav-count">{snapshot?.cases ?? "—"}</span>
+            <span className="nav-count">{cases.data?.data.length ?? "—"}</span>
           </button>
           <button
-            className={view === "reliability" ? "active" : ""}
-            onClick={() => setView("reliability")}
+            className={view === "architecture" ? "active" : ""}
+            onClick={() => setView("architecture")}
           >
-            <span aria-hidden="true">⇄</span>Confiabilidade
+            <span aria-hidden="true">⇄</span>Arquitetura
           </button>
         </nav>
         <div className="sidebar-note">
           <span>◈</span>
           <strong>Somente dados sintéticos</strong>
           <p>
-            Um fluxo fictício de triagem. Nenhuma mensagem é enviada para
-            pessoas ou serviços externos.
+            Uma fila fictícia para aceitar solicitações, acompanhar triagem e
+            demonstrar entrega confiável.
           </p>
         </div>
         <div className="sidebar-footer">
-          PORTFÓLIO BACKEND<span>Node.js · PostgreSQL · RabbitMQ</span>
+          PRODUTO FICTÍCIO<span>Node.js · PostgreSQL · RabbitMQ</span>
         </div>
       </aside>
       <main>
         <header className="topbar">
           <span>
             Workspace <b>/</b>{" "}
-            {view === "cases" ? "Solicitações" : "Confiabilidade"}
+            {view === "cases" ? "Solicitações" : "Arquitetura"}
           </span>
           <div className="topbar-status">
-            <i className={snapshot ? "dot green" : "dot amber"} />
-            {snapshot ? "API disponível" : "API sem leitura"}
+            <i className={productAvailable ? "dot green" : "dot amber"} />
+            {productAvailable ? "API disponível" : "API sem leitura"}
             <span className="demo-badge">DEMO</span>
           </div>
         </header>
@@ -655,13 +675,13 @@ export function App() {
               <span className="eyebrow">TRIAGEM & ACOMPANHAMENTO</span>
               <h1>
                 {view === "cases"
-                  ? "Cada solicitação, uma jornada."
-                  : "Confiabilidade que você pode observar."}
+                  ? "Da entrada à resolução, sem perder o rastro."
+                  : "Quando o broker falha, a fila continua."}
               </h1>
               <p>
                 {view === "cases"
-                  ? "Crie, acompanhe e veja a entrega acontecer, do primeiro registro à notificação."
-                  : "Interrompa o broker, acompanhe a recuperação e comprove a idempotência."}
+                  ? "CareQueue registra solicitações fictícias, guia a triagem e mostra o histórico de cada mudança."
+                  : "Pare o RabbitMQ, crie uma solicitação e veja a outbox publicar o evento quando o broker voltar."}
               </p>
             </div>
             <button
@@ -671,8 +691,12 @@ export function App() {
               <span aria-hidden="true">＋</span>Nova solicitação
             </button>
           </section>
-          <Metrics data={snapshot} error={operations.error} />
-          <ErrorNotice error={operations.error} />
+          {view === "architecture" && (
+            <>
+              <Metrics data={snapshot} error={operations.error} />
+              <ErrorNotice error={operations.error} />
+            </>
+          )}
           {notice && (
             <div className="success-notice" role="status">
               {notice}
@@ -691,7 +715,7 @@ export function App() {
                 <div className="panel-heading">
                   <div>
                     <h2>Solicitações</h2>
-                    <p>Uma fila organizada, do início ao fim.</p>
+                    <p>A operação em andamento, com status e histórico.</p>
                   </div>
                   <label className="filter-label">
                     Status
@@ -758,7 +782,7 @@ export function App() {
                     <h3>
                       {filter
                         ? "Nenhuma solicitação neste status"
-                        : "A fila começa com uma solicitação"}
+                        : "A operação começa com uma solicitação"}
                     </h3>
                     <p>Crie um exemplo sintético para explorar o fluxo.</p>
                     <button
@@ -814,20 +838,20 @@ export function App() {
               ) : (
                 <aside className="panel selection-empty">
                   <span className="empty-icon">↗</span>
-                  <span className="eyebrow">DO REGISTRO À ENTREGA</span>
-                  <h2>Toda etapa deixa um rastro.</h2>
+                  <span className="eyebrow">FLUXO DO PRODUTO</span>
+                  <h2>Selecione uma solicitação para trabalhar nela.</h2>
                   <p>
-                    Selecione uma solicitação para ver o histórico, avançar a
-                    triagem e acompanhar a notificação simulada.
+                    Veja o histórico e avance o status conforme a solicitação
+                    passa pela triagem.
                   </p>
                   <div className="mini-flow">
-                    <span>Registro</span>
+                    <span>Aberta</span>
                     <i>→</i>
-                    <span>Evento</span>
+                    <span>Triagem</span>
                     <i>→</i>
-                    <span>Notificação</span>
+                    <span>Resolvida</span>
                   </div>
-                  <small>Entrega at least once · consumidor idempotente</small>
+                  <small>A arquitetura fica na aba dedicada.</small>
                 </aside>
               )}
             </div>
@@ -840,7 +864,11 @@ export function App() {
           )}
           <footer className="page-footer">
             <span>CareQueue · demonstração com dados sintéticos</span>
-            <span>Persistência primeiro. Entrega em segundo plano.</span>
+            <span>
+              {view === "cases"
+                ? "Produto fictício para triagem e acompanhamento."
+                : "Persistência primeiro. Entrega em segundo plano."}
+            </span>
           </footer>
         </div>
       </main>
