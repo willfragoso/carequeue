@@ -1146,6 +1146,51 @@ td time {
   margin-top: 7px;
   color: #8ea18f;
 }
+.glossary-panel {
+  padding: 28px;
+}
+.glossary-panel h2 {
+  font-size: 24px;
+  margin-bottom: 11px;
+}
+.glossary-panel > p {
+  max-width: 820px;
+  color: #7f968c;
+  font-size: 12px;
+  line-height: 1.8;
+  margin-bottom: 25px;
+}
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.glossary-card {
+  min-height: 165px;
+  border: 1px solid #dfe9e2;
+  border-radius: 7px;
+  background: #fbfdfb;
+  padding: 17px;
+}
+.glossary-card h3 {
+  color: #315c50;
+  font-size: 14px;
+  margin-bottom: 9px;
+}
+.glossary-card p {
+  color: #718980;
+  font-size: 11px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.glossary-card small {
+  display: block;
+  color: #94a69f;
+  font-size: 10px;
+  line-height: 1.7;
+  border-top: 1px solid #edf2ef;
+  padding-top: 11px;
+}
 @media (min-width: 1600px) {
   .main-content {
     padding-top: 48px;
@@ -1186,6 +1231,9 @@ td time {
     grid-template-columns: minmax(0, 1fr);
   }
   .architecture-canvas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .glossary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .architecture-node:nth-child(3) .architecture-arrow {
@@ -1345,12 +1393,21 @@ td time {
   .architecture-panel {
     padding: 24px 19px;
   }
+  .glossary-panel {
+    padding: 24px 19px;
+  }
   .architecture-panel h2 {
     font-size: 19px;
   }
   .architecture-canvas {
     grid-template-columns: minmax(0, 1fr);
     padding: 12px;
+  }
+  .glossary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .glossary-card {
+    min-height: auto;
   }
   .architecture-node {
     min-height: auto;

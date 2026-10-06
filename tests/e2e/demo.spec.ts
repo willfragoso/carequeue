@@ -127,4 +127,14 @@ test("works at a mobile viewport without horizontal document overflow", async ({
       name: "Como uma solicitação vira uma notificação confiável.",
     }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Glossário", exact: true }).click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Termos técnicos em linguagem simples.",
+    }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Outbox" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Idempotência" }),
+  ).toBeVisible();
 });
