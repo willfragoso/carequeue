@@ -29,6 +29,12 @@ test("creates a synthetic case, advances triage and traces its notification", as
   ).toHaveCount(0);
   await page.getByRole("button", { name: "Arquitetura", exact: true }).click();
   await expect(
+    page.getByRole("heading", {
+      name: "Como uma solicitação vira uma notificação confiável.",
+    }),
+  ).toBeVisible();
+  await expect(page.getByText("Cases + History + Outbox")).toBeVisible();
+  await expect(
     details.getByText("Notificação simulada salva", { exact: true }),
   ).toBeVisible({ timeout: 15000 });
   await expect(
@@ -117,6 +123,8 @@ test("works at a mobile viewport without horizontal document overflow", async ({
   ).toBe(true);
   await page.getByRole("button", { name: "Arquitetura", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Veja a fila se recuperar." }),
+    page.getByRole("heading", {
+      name: "Como uma solicitação vira uma notificação confiável.",
+    }),
   ).toBeVisible();
 });

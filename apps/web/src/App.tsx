@@ -288,6 +288,72 @@ function DeliveryFlow({ event }: { event: Delivery | undefined }) {
     </div>
   );
 }
+const architectureSteps = [
+  {
+    number: "01",
+    title: "API recebe a solicitação",
+    label: "Express API",
+    detail: "Valida a entrada HTTP, gera o correlationId e inicia a transação.",
+  },
+  {
+    number: "02",
+    title: "PostgreSQL confirma o registro",
+    label: "Cases + History + Outbox",
+    detail:
+      "Grava a solicitação, o histórico inicial e o evento CaseCreated.v1 juntos.",
+  },
+  {
+    number: "03",
+    title: "Publisher entrega ao broker",
+    label: "Outbox relay",
+    detail:
+      "Lê eventos pendentes e só marca como publicado após publisher confirm.",
+  },
+  {
+    number: "04",
+    title: "RabbitMQ desacopla o trabalho",
+    label: "RabbitMQ",
+    detail:
+      "Mantém a mensagem durável e aplica retentativas limitadas antes da DLQ.",
+  },
+  {
+    number: "05",
+    title: "Worker salva o efeito",
+    label: "Worker",
+    detail:
+      "Consome at least once, grava a notificação por eventId e só então confirma.",
+  },
+  {
+    number: "06",
+    title: "Observabilidade fecha o ciclo",
+    label: "Delivery view",
+    detail:
+      "Mostra eventId, correlationId, status de entrega, retry e dead-letter queue.",
+  },
+];
+function ArchitectureCanvas() {
+  return (
+    <section className="panel architecture-panel">
+      <div className="panel-kicker">DIAGRAMA DO FLUXO</div>
+      <h2>Como uma solicitação vira uma notificação confiável.</h2>
+      <div className="architecture-canvas" aria-label="Arquitetura CareQueue">
+        {architectureSteps.map((step, index) => (
+          <article key={step.number} className="architecture-node">
+            <span className="architecture-number">{step.number}</span>
+            <strong>{step.label}</strong>
+            <small>{step.title}</small>
+            <p>{step.detail}</p>
+            {index < architectureSteps.length - 1 && (
+              <span className="architecture-arrow" aria-hidden="true">
+                →
+              </span>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
 function CaseDetails({
   id,
   onChange,
@@ -494,58 +560,61 @@ function Reliability({
   );
   return (
     <div className="reliability-grid">
-      <section className="panel demo-guide">
-        <div className="panel-kicker">ARQUITETURA & OBSERVABILIDADE</div>
-        <h2>Veja a fila se recuperar.</h2>
-        <p className="quiet">
-          Esta tela mostra a parte técnica: outbox, RabbitMQ, retentativas,
-          dead-letter queue e idempotência do consumidor.
-        </p>
-        <ol className="guide-list">
-          <li>
-            <span>01</span>
-            <div>
-              <h3>Interrompa o RabbitMQ</h3>
-              <p>No terminal do projeto:</p>
-              <code>docker compose stop rabbitmq</code>
-            </div>
-          </li>
-          <li>
-            <span>02</span>
-            <div>
-              <h3>Crie uma solicitação sintética</h3>
-              <p>A API persiste os dados e o evento na mesma transação.</p>
-              <button className="secondary" onClick={onNew}>
-                Criar durante a demonstração
-              </button>
-            </div>
-          </li>
-          <li>
-            <span>03</span>
-            <div>
-              <h3>Restaure o broker</h3>
-              <code>docker compose start rabbitmq</code>
-              <p>Acompanhe a notificação surgir no painel de detalhes.</p>
-            </div>
-          </li>
-          <li>
-            <span>04</span>
-            <div>
-              <h3>Repita a entrega</h3>
-              <p>
-                Use o eventId da solicitação selecionada. A quantidade de
-                notificações deve permanecer em um.
-              </p>
-              <code className="wrap-code">
-                {event.data?.data[0]
-                  ? "docker compose exec publisher node dist/src/replay.js " +
-                    event.data.data[0].eventId
-                  : "Selecione uma solicitação para obter o eventId."}
-              </code>
-            </div>
-          </li>
-        </ol>
-      </section>
+      <div className="architecture-column">
+        <ArchitectureCanvas />
+        <section className="panel demo-guide">
+          <div className="panel-kicker">DEMONSTRAÇÃO GUIADA</div>
+          <h2>Veja a fila se recuperar.</h2>
+          <p className="quiet">
+            Pare o broker, crie uma solicitação e acompanhe a outbox publicar o
+            evento quando o RabbitMQ voltar.
+          </p>
+          <ol className="guide-list">
+            <li>
+              <span>01</span>
+              <div>
+                <h3>Interrompa o RabbitMQ</h3>
+                <p>No terminal do projeto:</p>
+                <code>docker compose stop rabbitmq</code>
+              </div>
+            </li>
+            <li>
+              <span>02</span>
+              <div>
+                <h3>Crie uma solicitação sintética</h3>
+                <p>A API persiste os dados e o evento na mesma transação.</p>
+                <button className="secondary" onClick={onNew}>
+                  Criar durante a demonstração
+                </button>
+              </div>
+            </li>
+            <li>
+              <span>03</span>
+              <div>
+                <h3>Restaure o broker</h3>
+                <code>docker compose start rabbitmq</code>
+                <p>Acompanhe a notificação surgir no painel de detalhes.</p>
+              </div>
+            </li>
+            <li>
+              <span>04</span>
+              <div>
+                <h3>Repita a entrega</h3>
+                <p>
+                  Use o eventId da solicitação selecionada. A quantidade de
+                  notificações deve permanecer em um.
+                </p>
+                <code className="wrap-code">
+                  {event.data?.data[0]
+                    ? "docker compose exec publisher node dist/src/replay.js " +
+                      event.data.data[0].eventId
+                    : "Selecione uma solicitação para obter o eventId."}
+                </code>
+              </div>
+            </li>
+          </ol>
+        </section>
+      </div>
       <div>
         <section className="panel queue-panel">
           <div className="panel-kicker">LEITURA DO BROKER</div>

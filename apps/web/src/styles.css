@@ -965,6 +965,93 @@ td time {
   gap: 21px;
   align-items: start;
 }
+.architecture-column {
+  display: grid;
+  gap: 21px;
+}
+.architecture-panel {
+  padding: 27px;
+}
+.architecture-panel h2 {
+  font-size: 23px;
+  margin: 0 0 18px;
+}
+.architecture-canvas {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #dfe9e2;
+  border-radius: 8px;
+  background:
+    linear-gradient(#f7faf7 1px, transparent 1px),
+    linear-gradient(90deg, #f7faf7 1px, transparent 1px), #fbfdfb;
+  background-size: 24px 24px;
+}
+.architecture-node {
+  position: relative;
+  min-height: 186px;
+  padding: 16px;
+  border: 1px solid #d9e8dd;
+  border-radius: 7px;
+  background: #ffffffee;
+  box-shadow: 0 16px 35px #3259420d;
+}
+.architecture-number {
+  display: inline-grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  background: #e9f5ec;
+  color: #5c8f71;
+  font-family: Consolas, monospace;
+  font-size: 11px;
+  margin-bottom: 12px;
+}
+.architecture-node strong {
+  display: block;
+  font-size: 13px;
+  color: #375c4e;
+  margin-bottom: 6px;
+}
+.architecture-node small {
+  display: block;
+  color: #71917e;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+.architecture-node p {
+  margin-top: 11px;
+  color: #8a9e94;
+  font-size: 10px;
+  line-height: 1.7;
+}
+.architecture-arrow {
+  position: absolute;
+  right: -13px;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #cfe3d5;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #6d9678;
+  transform: translateY(-50%);
+  box-shadow: 0 10px 25px #2b4e3a18;
+}
+.architecture-node:nth-child(3) .architecture-arrow {
+  left: 50%;
+  right: auto;
+  top: auto;
+  bottom: -21px;
+  transform: translateX(-50%) rotate(90deg);
+}
 .demo-guide {
   padding: 27px;
 }
@@ -1097,6 +1184,24 @@ td time {
   .cases-grid,
   .reliability-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .architecture-canvas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .architecture-node:nth-child(3) .architecture-arrow {
+    left: auto;
+    right: -13px;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+  }
+  .architecture-node:nth-child(2) .architecture-arrow,
+  .architecture-node:nth-child(4) .architecture-arrow {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: -21px;
+    transform: translateX(-50%) rotate(90deg);
   }
   .metrics {
     gap: 10px;
@@ -1236,6 +1341,29 @@ td time {
   }
   .demo-guide {
     padding: 24px 19px;
+  }
+  .architecture-panel {
+    padding: 24px 19px;
+  }
+  .architecture-panel h2 {
+    font-size: 19px;
+  }
+  .architecture-canvas {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px;
+  }
+  .architecture-node {
+    min-height: auto;
+  }
+  .architecture-arrow,
+  .architecture-node:nth-child(2) .architecture-arrow,
+  .architecture-node:nth-child(3) .architecture-arrow,
+  .architecture-node:nth-child(4) .architecture-arrow {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: -21px;
+    transform: translateX(-50%) rotate(90deg);
   }
   .guide-list li {
     gap: 12px;
