@@ -1,0 +1,44 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-bookworm
+        env:
+          POSTGRES_USER: carequeue
+          POSTGRES_PASSWORD: local_demo_only
+          POSTGRES_DB: carequeue_test
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U carequeue -d carequeue_test" --health-interval 3s --health-timeout 3s --health-retries 20
+      rabbitmq:
+        image: rabbitmq:4.3-management
+        env:
+          RABBITMQ_DEFAULT_USER: carequeue
+          RABBITMQ_DEFAULT_PASS: local_demo_only
+        ports: ["5672:5672"]
+        options: --health-cmd "rabbitmq-diagnostics -q ping" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgres://carequeue:local_demo_only@localhost:5432/carequeue_test
+      RABBITMQ_URL: amqp://carequeue:local_demo_only@localhost:5672
+      RETRY_DELAY_MS: 100
+      MAX_RETRIES: 3
+      ALLOW_DESTRUCTIVE_TESTS: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install -g pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm test:integration
+      - run: pnpm build

@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:18-bookworm
+    environment:
+      POSTGRES_USER: carequeue
+      POSTGRES_PASSWORD: local_demo_only
+      POSTGRES_DB: carequeue_test
+    ports: ["127.0.0.1:5433:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carequeue -d carequeue_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  rabbitmq:
+    image: rabbitmq:4.3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: carequeue
+      RABBITMQ_DEFAULT_PASS: local_demo_only
+    ports: ["127.0.0.1:5673:5672"]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
