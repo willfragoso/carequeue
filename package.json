@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run --exclude tests/integration.test.ts --exclude tests/*.integration.test.ts",
-    "test:integration": "vitest run tests/integration.test.ts tests/*.integration.test.ts",
+    "test:integration": "vitest run integration",
     "start": "node dist/src/api.js",
     "publisher": "node dist/src/publisher.js",
     "worker": "node dist/src/worker.js",
