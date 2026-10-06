@@ -8,6 +8,7 @@ import {
   createCase,
   getCase,
   listCases,
+  listCasesCursor,
   changeStatus,
   history,
   notifications,
@@ -63,12 +64,32 @@ export function createApp() {
     const query = z
       .object({
         status: statusSchema.optional(),
-        page: z.coerce.number().int().min(1).max(100000).default(1),
+        page: z.coerce.number().int().min(1).max(100000).optional(),
+        pagination: z.enum(["offset", "cursor"]).default("offset"),
+        cursor: z
+          .string()
+          .regex(/^[A-Za-z0-9_-]+$/)
+          .max(512)
+          .optional(),
         pageSize: z.coerce.number().int().min(1).max(100).default(20),
       })
       .strict()
       .parse(req.query);
-    res.json(await listCases(query.status, query.page, query.pageSize));
+    if (
+      (query.pagination === "cursor" && query.page !== undefined) ||
+      (query.pagination === "offset" && query.cursor !== undefined)
+    ) {
+      throw new HttpError(
+        400,
+        "INVALID_PAGINATION",
+        "Do not mix cursor and offset pagination",
+      );
+    }
+    res.json(
+      query.pagination === "cursor"
+        ? await listCasesCursor(query.status, query.pageSize, query.cursor)
+        : await listCases(query.status, query.page ?? 1, query.pageSize),
+    );
   });
   app.get("/api/operations", async (_req, res) =>
     res.json({ data: await operations() }),

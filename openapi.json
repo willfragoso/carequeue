@@ -134,7 +134,8 @@
               "minimum": 1,
               "maximum": 100000,
               "default": 1
-            }
+            },
+            "description": "Legacy offset mode only"
           },
           {
             "name": "pageSize",
@@ -145,6 +146,23 @@
               "maximum": 100,
               "default": 20
             }
+          },
+          {
+            "name": "pagination",
+            "in": "query",
+            "schema": {
+              "enum": ["offset", "cursor"],
+              "default": "offset"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Opaque cursor bound to status filter; only in cursor mode"
           }
         ],
         "responses": {
@@ -161,27 +179,58 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": ["data"],
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Case"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "required": ["data"],
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Case"
+                          }
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "page": {
+                              "type": "integer"
+                            },
+                            "pageSize": {
+                              "type": "integer"
+                            }
+                          }
+                        }
                       }
                     },
-                    "pagination": {
+                    {
                       "type": "object",
+                      "required": ["data", "pagination"],
                       "properties": {
-                        "page": {
-                          "type": "integer"
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Case"
+                          }
                         },
-                        "pageSize": {
-                          "type": "integer"
+                        "pagination": {
+                          "type": "object",
+                          "required": ["mode", "pageSize", "nextCursor"],
+                          "properties": {
+                            "mode": {
+                              "const": "cursor"
+                            },
+                            "pageSize": {
+                              "type": "integer"
+                            },
+                            "nextCursor": {
+                              "type": ["string", "null"]
+                            }
+                          }
                         }
                       }
                     }
-                  }
+                  ]
                 }
               }
             }
