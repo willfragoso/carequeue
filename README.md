@@ -8,13 +8,14 @@ Cases move through **OPEN → TRIAGE → ASSIGNED → RESOLVED**. Skipping, reve
 
 ## Stack and architecture
 
-Node.js 24 LTS, TypeScript 6, Express 5, PostgreSQL 18, RabbitMQ 4.3, amqplib 2, Zod 4, Pino 10, Vitest 5, ESLint 10, and pnpm 11.19.0. The committed lockfile fixes dependency resolution. TypeScript 6 is selected because typescript-eslint currently supports versions below 6.1; TypeScript 7 is not compatible with this lint configuration.
+React 19, Vite 8, Node.js 24 LTS, TypeScript 6, Express 5, PostgreSQL 18, RabbitMQ 4.3, amqplib 2, Zod 4, Pino 10, Vitest 5, ESLint 10, and pnpm 11.19.0. The committed lockfile fixes dependency resolution. TypeScript 6 is selected because typescript-eslint currently supports versions below 6.1; TypeScript 7 is not compatible with this lint configuration.
 
 Official references: [Node releases](https://nodejs.org/en/about/previous-releases), [Express 5](https://expressjs.com/en/guide/migrating-5/), [PostgreSQL support](https://www.postgresql.org/support/versioning/), [RabbitMQ releases](https://www.rabbitmq.com/release-information), [confirms and acknowledgements](https://www.rabbitmq.com/docs/confirms), [typescript-eslint compatibility](https://typescript-eslint.io/users/dependency-versions/).
 
 ```mermaid
 flowchart LR
-  Client --> API[Express API]
+  Client --> Frontend[React console / Nginx]
+  Frontend --> API[Express API]
   API -->|one transaction| DB[(PostgreSQL: cases + history + outbox)]
   DB --> Relay[Outbox publisher]
   Relay -->|persistent message + confirm| MQ[RabbitMQ]
@@ -186,9 +187,9 @@ There is still one notification; worker logs show duplicate_detected. Replay is 
 
 ## Decisions and limitations
 
-- Synthetic local demo only: no authentication, UI, email, AI, cloud infrastructure, real patient data, or external notification side effects.
+- Synthetic local demo only: no authentication, email, AI, cloud infrastructure, real patient data, or external notification side effects.
 - PostgreSQL is the source of truth. One-row relay transactions keep the design understandable but bound throughput and hold a database connection during broker confirms.
-- Classic durable queues with TTL dead-letter routing are sufficient to demonstrate broker outages and worker interruption. Classic queue dead-letter forwarding can lose a message if its target is unavailable; a production cluster should use quorum queues and at-least-once dead-lettering, policies and operational monitoring. This demo makes no guarantee against broker disk loss or cluster failure.
+- Classic durable queues with per-attempt TTL dead-letter routing are sufficient to demonstrate broker outages and worker interruption. Classic queue dead-letter forwarding can lose a message if its target is unavailable; a production cluster should use quorum queues and at-least-once dead-lettering, policies and operational monitoring. This demo makes no guarantee against broker disk loss or cluster failure.
 - Retry counters bound normal processing failures. Ambiguous confirmations and redelivery can create extra physical attempts; database idempotency prevents repeated notification effects.
 - Legacy offset pagination remains supported and can shift under concurrent inserts. Use pagination=cursor for stable traversal with microsecond timestamp + UUID ordering. Cursors are opaque, versioned and tied to the status filter; changing filters requires restarting traversal. Cursor pagination is not a snapshot: status changes may alter membership. No total count is promised. History/notification collections are small and unpaginated.
 - No event retention, DLQ replay service or HTTP create idempotency key. Forward-only SQL migrations run under an advisory lock; pending SQL and bookkeeping commit together. Applied files cannot be edited or removed: SHA-256 checksums detect drift. Add a new numbered SQL file for changes. The existing initial schema can be adopted without deleting data because 001_init.sql uses IF NOT EXISTS. There is no automatic down migration.
@@ -202,7 +203,7 @@ Executed locally with Node 24.19.0: frozen-lockfile installation, dependency pee
 
 A real broker stop/start demonstration persisted a case while RabbitMQ was stopped, left its outbox event pending, and produced one notification after recovery. Replaying the event twice still yielded one notification. API, publisher and worker exited with code 0 on graceful stop, and were restarted. Disposable test containers were removed; the local demo stack remains running.
 
-The GitHub Actions workflow is configured but has not been executed on GitHub in this session. Review the workflow, queue durability limitations and migration strategy before extending the project.
+The initial verification preceded GitHub Actions execution. Subsequent backend evolution PRs passed the workflow. Review the workflow, queue durability limitations and migration strategy before extending the project.
 
 ## Delivery inspection
 
@@ -213,3 +214,60 @@ GET /api/cases/:id/delivery exposes eventId, correlationId, timestamps and the d
 ## Cursor pagination
 
 GET /api/cases?pagination=cursor&pageSize=20 returns pagination.nextCursor. Supply it as cursor on the next request, keeping the same status filter. A null nextCursor marks the end. Newer inserts do not shift later pages. The legacy page parameter remains available with pagination=offset (default), but cannot be mixed with cursor mode.
+
+## Demonstration frontend
+
+The React + Vite + TypeScript console is available at **http://localhost:8080** after `docker compose up --build -d`. It shares the API origin through an Nginx proxy; the browser receives no database/broker credentials. All displayed delivery states and queue counts come from API responses, not timers or mock data.
+
+- **Solicitações**: create synthetic cases, filter and traverse with cursor pagination, advance only adjacent statuses, inspect history and notification delivery.
+- **Confiabilidade**: read pending outbox/queue/DLQ counts and follow a stop/create/restart/replay walkthrough.
+- eventId and correlationId are visible and copyable. HTTP failures include their correlation ID.
+- Polling runs every three seconds without overlapping requests; changing selection/filter cancels obsolete requests. Network failures show unavailable data rather than invented zero counts.
+
+For frontend development with the API running:
+
+```sh
+pnpm dev:frontend
+# Open http://localhost:5173 (Vite proxies /api and /health to localhost:3000)
+```
+
+The root `pnpm build`, `pnpm typecheck` and `pnpm lint` include the frontend. To run browser tests against the local Compose stack:
+
+```sh
+pnpm exec playwright install chromium
+pnpm test:e2e
+```
+
+On this Windows machine an installed Chrome was used instead of downloading Chromium:
+
+```powershell
+$env:E2E_BROWSER_CHANNEL='chrome'
+pnpm test:e2e
+```
+
+Browser tests create synthetic cases in the local demo database; run them only against a demo environment. The workflow has an isolated E2E job that builds the entire Compose stack and runs Chromium tests. Tests cover creation, all status transitions, saved notifications, history, displayed errors and mobile layout. One browser test explicitly intercepts an HTTP response to verify error presentation; the main workflow and backend integration tests use real services.
+
+Actual failure demonstration through the UI:
+
+1. Run `docker compose stop rabbitmq`.
+2. Create a case in the console: it persists and shows pendingPublication.
+3. Run `docker compose start rabbitmq`: the publisher and worker reconnect; the UI moves to a saved notification.
+4. Replay its eventId twice using the command shown in Confiabilidade. Its notification count remains one.
+
+[Broker outage screenshot](docs/frontend-outage.png) · [Recovered delivery screenshot](docs/frontend-recovery.png)
+
+## Review the evolution
+
+These are real successive changes, with separate commits and dependent pull requests. No branch has been merged. Review and merge in order, retargeting the next PR after its prerequisite is merged:
+
+| PR                                                        | Problem addressed                               | Evidence                                            |
+| --------------------------------------------------------- | ----------------------------------------------- | --------------------------------------------------- |
+| [#1](https://github.com/willfragoso/carequeue-api/pull/1) | Untracked schema bootstrap                      | Concurrent runners, checksum drift, atomic rollback |
+| [#2](https://github.com/willfragoso/carequeue-api/pull/2) | Delivery difficult to inspect                   | State progression and broker-unavailable snapshots  |
+| [#3](https://github.com/willfragoso/carequeue-api/pull/3) | Retries use the same fixed delay                | Real broker TTL timing and bounded DLQ              |
+| [#4](https://github.com/willfragoso/carequeue-api/pull/4) | Offset pages shift on inserts                   | Concurrent inserts and microsecond precision        |
+| Frontend PR                                               | Demonstration required terminal-only inspection | Real browser workflow, errors and mobile viewport   |
+
+The four backend PRs passed GitHub Actions. Local frontend verification passed three browser tests on Chrome, types, lint and production build. A case created in the UI with RabbitMQ stopped was later notified after recovery; two replays still left exactly one database notification. Existing data was preserved when adopting all three versioned migrations.
+
+Known frontend limitations: no login, no control of Docker from the browser, no per-event retry/DLQ tracing, no historical metrics, and no push updates (polling is used). The console is intended for a local synthetic demonstration.

@@ -182,7 +182,7 @@
                   "oneOf": [
                     {
                       "type": "object",
-                      "required": ["data"],
+                      "required": ["data", "pagination"],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -199,7 +199,8 @@
                             "pageSize": {
                               "type": "integer"
                             }
-                          }
+                          },
+                          "required": ["page", "pageSize"]
                         }
                       }
                     },
