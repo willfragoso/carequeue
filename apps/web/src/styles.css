@@ -1296,18 +1296,25 @@ td time {
     display: none;
   }
   .sidebar nav {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 7px;
     margin-top: 20px;
   }
   nav button {
-    width: auto;
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
     margin: 0;
-    padding: 10px 13px;
-    font-size: 11px;
+    padding: 10px 7px;
+    font-size: 10px;
+    gap: 6px;
+  }
+  nav button > span:first-child {
+    font-size: 14px;
   }
   .nav-count {
-    margin-left: 5px;
+    display: none;
   }
   .topbar {
     height: 52px;
