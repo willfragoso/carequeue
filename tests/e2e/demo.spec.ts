@@ -30,6 +30,16 @@ test("creates a synthetic case, advances triage and traces its notification", as
   await page.getByRole("button", { name: "Arquitetura", exact: true }).click();
   await expect(
     page.getByRole("heading", {
+      name: "Componentes que executam a demonstração.",
+    }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByLabel("Diagrama dos sistemas CareQueue")
+      .getByText("Express API", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
       name: "Como uma solicitação vira uma notificação confiável.",
     }),
   ).toBeVisible();
@@ -122,6 +132,11 @@ test("works at a mobile viewport without horizontal document overflow", async ({
     ),
   ).toBe(true);
   await page.getByRole("button", { name: "Arquitetura", exact: true }).click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Componentes que executam a demonstração.",
+    }),
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: "Como uma solicitação vira uma notificação confiável.",

@@ -531,6 +531,95 @@ function ArchitectureCanvas() {
     </section>
   );
 }
+function SystemsMap() {
+  return (
+    <section className="panel systems-map-panel">
+      <div className="panel-kicker">MAPA DOS SISTEMAS</div>
+      <h2>Componentes que executam a demonstração.</h2>
+      <div
+        className="systems-board"
+        aria-label="Diagrama dos sistemas CareQueue"
+      >
+        <svg
+          className="systems-lines"
+          viewBox="0 0 1000 430"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <marker
+              id="arrowhead"
+              markerHeight="8"
+              markerWidth="8"
+              orient="auto"
+              refX="7"
+              refY="4"
+            >
+              <path d="M0,0 L8,4 L0,8 Z" />
+            </marker>
+          </defs>
+          <path d="M185 147 H333" />
+          <path d="M492 135 H644" />
+          <path d="M492 207 H644" />
+          <path d="M770 163 H844" />
+          <path d="M770 236 H844" />
+          <path d="M708 286 V342 H474" />
+          <path d="M402 284 V342 H226 V234" />
+        </svg>
+        <div className="systems-zone zone-client">
+          <span>Usuário</span>
+          <article className="system-card accent-teal">
+            <b>React console</b>
+            <small>Solicitações, arquitetura e glossário no navegador.</small>
+          </article>
+        </div>
+        <div className="systems-zone zone-api">
+          <span>Aplicação Node.js</span>
+          <article className="system-card accent-blue">
+            <b>Express API</b>
+            <small>Validação HTTP, regras de status e correlationId.</small>
+          </article>
+          <article className="system-card accent-purple">
+            <b>Outbox publisher</b>
+            <small>Lê eventos pendentes e publica com confirmação.</small>
+          </article>
+          <article className="system-card accent-orange">
+            <b>Worker</b>
+            <small>Consome eventos e salva a notificação simulada.</small>
+          </article>
+        </div>
+        <div className="systems-zone zone-data">
+          <span>Persistência</span>
+          <article className="system-card accent-green">
+            <b>PostgreSQL</b>
+            <small>Cases, histórico, outbox e notificações.</small>
+          </article>
+        </div>
+        <div className="systems-zone zone-broker">
+          <span>Mensageria</span>
+          <article className="system-card accent-amber">
+            <b>RabbitMQ</b>
+            <small>Fila principal, retries limitados e DLQ.</small>
+          </article>
+        </div>
+        <ol className="systems-legend" aria-label="Legenda do mapa">
+          <li>
+            <span>1</span> Console chama a API.
+          </li>
+          <li>
+            <span>2</span> API grava dados e evento na mesma transação.
+          </li>
+          <li>
+            <span>3</span> Publisher envia o evento para o broker.
+          </li>
+          <li>
+            <span>4</span> Worker processa com idempotência.
+          </li>
+        </ol>
+      </div>
+    </section>
+  );
+}
 function Glossary() {
   return (
     <section className="panel glossary-panel">
@@ -760,6 +849,7 @@ function Reliability({
   return (
     <div className="reliability-grid">
       <div className="architecture-column">
+        <SystemsMap />
         <ArchitectureCanvas />
         <section className="panel demo-guide">
           <div className="panel-kicker">DEMONSTRAÇÃO GUIADA</div>
