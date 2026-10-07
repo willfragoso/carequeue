@@ -27,7 +27,7 @@ test("creates a synthetic case, advances triage and traces its notification", as
   await expect(
     details.getByRole("tab", { name: "Entrega do evento" }),
   ).toHaveCount(0);
-  await page.getByRole("button", { name: "Arquitetura", exact: true }).click();
+  await page.getByRole("button", { name: "Mapa", exact: true }).click();
   await expect(
     page.getByRole("heading", {
       name: "Componentes que executam a demonstração.",
@@ -38,6 +38,12 @@ test("creates a synthetic case, advances triage and traces its notification", as
       .getByLabel("Diagrama dos sistemas CareQueue")
       .getByText("Express API", { exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Como uma solicitação vira uma notificação confiável.",
+    }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Fluxo", exact: true }).click();
   await expect(
     page.getByRole("heading", {
       name: "Como uma solicitação vira uma notificação confiável.",
@@ -71,7 +77,7 @@ test("creates a synthetic case, advances triage and traces its notification", as
   ).toBeDisabled();
   await details.getByRole("tab", { name: /Histórico/ }).click();
   await expect(details.getByRole("listitem")).toHaveCount(4);
-  await page.getByRole("button", { name: "Arquitetura", exact: true }).click();
+  await page.getByRole("button", { name: "Fluxo", exact: true }).click();
   await expect(
     page.getByText("docker compose stop rabbitmq", { exact: true }),
   ).toBeVisible();
@@ -131,12 +137,13 @@ test("works at a mobile viewport without horizontal document overflow", async ({
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
-  await page.getByRole("button", { name: "Arquitetura", exact: true }).click();
+  await page.getByRole("button", { name: "Mapa", exact: true }).click();
   await expect(
     page.getByRole("heading", {
       name: "Componentes que executam a demonstração.",
     }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Fluxo", exact: true }).click();
   await expect(
     page.getByRole("heading", {
       name: "Como uma solicitação vira uma notificação confiável.",

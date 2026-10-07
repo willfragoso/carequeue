@@ -834,7 +834,14 @@ function CaseDetails({
     </aside>
   );
 }
-function Reliability({
+function SystemsMapPage() {
+  return (
+    <div className="systems-map-page">
+      <SystemsMap />
+    </div>
+  );
+}
+function FlowPage({
   operations,
   selectedId,
   onNew,
@@ -847,10 +854,9 @@ function Reliability({
     selectedId ? "/api/cases/" + selectedId + "/delivery" : null,
   );
   return (
-    <div className="architecture-layout">
-      <SystemsMap />
+    <div className="flow-layout">
       <div className="reliability-grid">
-        <div className="architecture-column">
+        <div className="flow-column">
           <ArchitectureCanvas />
           <section className="panel demo-guide">
             <div className="panel-kicker">DEMONSTRAÇÃO GUIADA</div>
@@ -958,7 +964,7 @@ function Reliability({
   );
 }
 export function App() {
-  const [view, setView] = useState<"cases" | "architecture" | "glossary">(
+  const [view, setView] = useState<"cases" | "systems" | "flow" | "glossary">(
     "cases",
   );
   const [filter, setFilter] = useState("");
@@ -968,7 +974,7 @@ export function App() {
   const [showNew, setShowNew] = useState(false);
   const [notice, setNotice] = useState("");
   const operations = useRemote<Data<Operations>>(
-    view === "architecture" ? "/api/operations" : null,
+    view === "flow" ? "/api/operations" : null,
   );
   const query = new URLSearchParams({ pagination: "cursor", pageSize: "10" });
   if (filter) query.set("status", filter);
@@ -1001,10 +1007,16 @@ export function App() {
             <span className="nav-count">{cases.data?.data.length ?? "—"}</span>
           </button>
           <button
-            className={view === "architecture" ? "active" : ""}
-            onClick={() => setView("architecture")}
+            className={view === "systems" ? "active" : ""}
+            onClick={() => setView("systems")}
           >
-            <span aria-hidden="true">⇄</span>Arquitetura
+            <span aria-hidden="true">▧</span>Mapa
+          </button>
+          <button
+            className={view === "flow" ? "active" : ""}
+            onClick={() => setView("flow")}
+          >
+            <span aria-hidden="true">⇄</span>Fluxo
           </button>
           <button
             className={view === "glossary" ? "active" : ""}
@@ -1031,9 +1043,11 @@ export function App() {
             Workspace <b>/</b>{" "}
             {view === "cases"
               ? "Solicitações"
-              : view === "architecture"
-                ? "Arquitetura"
-                : "Glossário"}
+              : view === "systems"
+                ? "Mapa dos sistemas"
+                : view === "flow"
+                  ? "Fluxo"
+                  : "Glossário"}
           </span>
           <div className="topbar-status">
             <i className={productAvailable ? "dot green" : "dot amber"} />
@@ -1048,16 +1062,20 @@ export function App() {
               <h1>
                 {view === "cases"
                   ? "Da entrada à resolução, sem perder o rastro."
-                  : view === "architecture"
-                    ? "Quando o broker falha, a fila continua."
-                    : "Um mapa para aprender os termos do projeto."}
+                  : view === "systems"
+                    ? "Os componentes do CareQueue em um mapa."
+                    : view === "flow"
+                      ? "Quando o broker falha, a fila continua."
+                      : "Um mapa para aprender os termos do projeto."}
               </h1>
               <p>
                 {view === "cases"
                   ? "CareQueue registra solicitações fictícias, guia a triagem e mostra o histórico de cada mudança."
-                  : view === "architecture"
-                    ? "Pare o RabbitMQ, crie uma solicitação e veja a outbox publicar o evento quando o broker voltar."
-                    : "Cada conceito aparece com uma explicação curta e o motivo de existir na demo."}
+                  : view === "systems"
+                    ? "Veja navegador, API, banco, mensageria e worker como blocos separados."
+                    : view === "flow"
+                      ? "Pare o RabbitMQ, crie uma solicitação e veja a outbox publicar o evento quando o broker voltar."
+                      : "Cada conceito aparece com uma explicação curta e o motivo de existir na demo."}
               </p>
             </div>
             <button
@@ -1067,7 +1085,7 @@ export function App() {
               <span aria-hidden="true">＋</span>Nova solicitação
             </button>
           </section>
-          {view === "architecture" && (
+          {view === "flow" && (
             <>
               <Metrics data={snapshot} error={operations.error} />
               <ErrorNotice error={operations.error} />
@@ -1231,8 +1249,10 @@ export function App() {
                 </aside>
               )}
             </div>
-          ) : view === "architecture" ? (
-            <Reliability
+          ) : view === "systems" ? (
+            <SystemsMapPage />
+          ) : view === "flow" ? (
+            <FlowPage
               operations={snapshot}
               selectedId={selectedId}
               onNew={() => setShowNew(true)}
@@ -1245,9 +1265,11 @@ export function App() {
             <span>
               {view === "cases"
                 ? "Produto fictício para triagem e acompanhamento."
-                : view === "architecture"
-                  ? "Persistência primeiro. Entrega em segundo plano."
-                  : "Aprendizado do zero, sem jargão desnecessário."}
+                : view === "systems"
+                  ? "Mapa visual dos componentes do sistema."
+                  : view === "flow"
+                    ? "Persistência primeiro. Entrega em segundo plano."
+                    : "Aprendizado do zero, sem jargão desnecessário."}
             </span>
           </footer>
         </div>
