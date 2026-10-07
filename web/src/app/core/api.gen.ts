@@ -32,7 +32,7 @@ export interface paths {
                 /** @description Success */
                 200: {
                     headers: {
-                        "x-correlation-id"?: string;
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -42,6 +42,7 @@ export interface paths {
                 /** @description Error */
                 400: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -51,6 +52,7 @@ export interface paths {
                 /** @description Error */
                 404: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -60,6 +62,7 @@ export interface paths {
                 /** @description Error */
                 500: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -92,7 +95,7 @@ export interface paths {
                 /** @description Created */
                 201: {
                     headers: {
-                        "x-correlation-id"?: string;
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -104,6 +107,7 @@ export interface paths {
                 /** @description Error */
                 400: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -113,6 +117,7 @@ export interface paths {
                 /** @description Error */
                 404: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -122,6 +127,7 @@ export interface paths {
                 /** @description Error */
                 413: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -131,6 +137,7 @@ export interface paths {
                 /** @description Error */
                 500: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -167,7 +174,7 @@ export interface paths {
                 /** @description Success */
                 200: {
                     headers: {
-                        "x-correlation-id"?: string;
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -179,6 +186,7 @@ export interface paths {
                 /** @description Error */
                 400: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -188,6 +196,7 @@ export interface paths {
                 /** @description Error */
                 404: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -197,6 +206,7 @@ export interface paths {
                 /** @description Error */
                 500: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -247,7 +257,7 @@ export interface paths {
                 /** @description Success */
                 200: {
                     headers: {
-                        "x-correlation-id"?: string;
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -259,6 +269,7 @@ export interface paths {
                 /** @description Error */
                 400: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -268,6 +279,7 @@ export interface paths {
                 /** @description Error */
                 404: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -277,6 +289,7 @@ export interface paths {
                 /** @description Error */
                 409: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -286,6 +299,7 @@ export interface paths {
                 /** @description Error */
                 500: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -318,7 +332,7 @@ export interface paths {
                 /** @description Success */
                 200: {
                     headers: {
-                        "x-correlation-id"?: string;
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -330,6 +344,7 @@ export interface paths {
                 /** @description Error */
                 400: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -339,6 +354,7 @@ export interface paths {
                 /** @description Error */
                 404: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -348,6 +364,7 @@ export interface paths {
                 /** @description Error */
                 500: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -386,7 +403,7 @@ export interface paths {
                 /** @description Success */
                 200: {
                     headers: {
-                        "x-correlation-id"?: string;
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -398,6 +415,7 @@ export interface paths {
                 /** @description Error */
                 400: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -407,6 +425,7 @@ export interface paths {
                 /** @description Error */
                 404: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -416,6 +435,7 @@ export interface paths {
                 /** @description Error */
                 500: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -452,7 +472,7 @@ export interface paths {
                 /** @description Success */
                 200: {
                     headers: {
-                        "x-correlation-id"?: string;
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -492,7 +512,7 @@ export interface paths {
                 /** @description Success */
                 200: {
                     headers: {
-                        "x-correlation-id"?: string;
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -505,6 +525,7 @@ export interface paths {
                 /** @description Error */
                 503: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -541,6 +562,7 @@ export interface paths {
                 /** @description Success */
                 200: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -552,6 +574,7 @@ export interface paths {
                 /** @description Error */
                 500: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -590,6 +613,7 @@ export interface paths {
                 /** @description Success */
                 200: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -601,6 +625,7 @@ export interface paths {
                 /** @description Error */
                 400: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -610,6 +635,7 @@ export interface paths {
                 /** @description Error */
                 404: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -619,6 +645,7 @@ export interface paths {
                 /** @description Error */
                 500: {
                     headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
                         [name: string]: unknown;
                     };
                     content: {
@@ -741,7 +768,9 @@ export interface components {
     responses: never;
     parameters: never;
     requestBodies: never;
-    headers: never;
+    headers: {
+        CorrelationId: string;
+    };
     pathItems: never;
 }
 export type $defs = Record<string, never>;
