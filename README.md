@@ -267,7 +267,7 @@ For frontend development with the API running:
 
 ```sh
 pnpm dev:frontend
-# Open http://localhost:5173 (the Angular dev server proxies /api and /health to localhost:3000)
+# Open http://localhost:4200 (the Angular dev server proxies /api and /health to localhost:3000)
 ```
 
 The frontend's wire types are generated from [api/openapi.json](api/openapi.json), the source of truth for the HTTP contract, into `web/src/app/core/api.gen.ts` (committed, never edited by hand). After changing the contract run:
