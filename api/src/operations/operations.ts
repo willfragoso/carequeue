@@ -1,10 +1,10 @@
 import amqp from "amqplib";
-import { config } from "./config.js";
-import { pool } from "./db.js";
-import { queues } from "./broker.js";
-import { getCase } from "./cases.js";
+import { config } from "../platform/config.js";
+import { pool } from "../platform/db.js";
+import { queues } from "../messaging/broker.js";
+import { getCase } from "../cases/cases.js";
 
-import { retryQueues } from "./retries.js";
+import { retryQueues } from "../messaging/retries.js";
 export type BrokerSnapshot =
   | {
       status: "available";

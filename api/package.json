@@ -13,12 +13,12 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --exclude tests/integration.test.ts --exclude tests/*.integration.test.ts",
-    "test:integration": "vitest run integration",
-    "start": "node dist/src/api.js",
-    "publisher": "node dist/src/publisher.js",
-    "worker": "node dist/src/worker.js",
-    "migrate": "node dist/src/migrate.js"
+    "test": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "start": "node dist/src/entrypoints/api.js",
+    "publisher": "node dist/src/entrypoints/publisher.js",
+    "worker": "node dist/src/entrypoints/worker.js",
+    "migrate": "node dist/src/entrypoints/migrate.js"
   },
   "dependencies": {
     "amqplib": "^2.2.0",

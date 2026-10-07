@@ -1,16 +1,16 @@
 import { randomUUID } from "node:crypto";
 import { beforeAll, afterAll, it, expect } from "vitest";
-import { pool } from "../src/db.js";
-import { applyMigrations } from "../src/migrations.js";
-import { createCase } from "../src/cases.js";
-import { operations, delivery } from "../src/operations.js";
-import { relayOne } from "../src/relay.js";
-import { saveNotification } from "../src/consumer.js";
+import { pool } from "../../src/platform/db.js";
+import { applyMigrations } from "../../src/platform/migrations.js";
+import { createCase } from "../../src/cases/cases.js";
+import { operations, delivery } from "../../src/operations/operations.js";
+import { relayOne } from "../../src/messaging/relay.js";
+import { saveNotification } from "../../src/messaging/consumer.js";
 // This suite shares application tables with the reliability suite; run files sequentially.
 beforeAll(async () => {
   if (process.env.ALLOW_DESTRUCTIVE_TESTS !== "true")
     throw new Error("Disposable services required");
-  await applyMigrations(pool, new URL("../migrations/", import.meta.url));
+  await applyMigrations(pool, new URL("../../migrations/", import.meta.url));
   await pool.query(
     "TRUNCATE notifications,outbox,case_history,cases RESTART IDENTITY CASCADE",
   );

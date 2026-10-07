@@ -40,7 +40,7 @@ services:
   migrate:
     build: { context: ., target: api }
     environment: *env
-    command: ["node", "dist/src/migrate.js"]
+    command: ["node", "dist/src/entrypoints/migrate.js"]
     depends_on:
       postgres:
         condition: service_healthy
@@ -60,7 +60,7 @@ services:
       retries: 10
   publisher:
     <<: *app
-    command: ["node", "dist/src/publisher.js"]
+    command: ["node", "dist/src/entrypoints/publisher.js"]
   frontend:
     build: { context: ., target: frontend }
     ports: ["127.0.0.1:8080:8080"]
@@ -70,7 +70,7 @@ services:
         condition: service_healthy
   worker:
     <<: *app
-    command: ["node", "dist/src/worker.js"]
+    command: ["node", "dist/src/entrypoints/worker.js"]
 volumes:
   postgres_data:
   rabbit_data:

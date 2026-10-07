@@ -1,3 +1,4 @@
+name: carequeue-test
 services:
   postgres:
     image: postgres:18-bookworm

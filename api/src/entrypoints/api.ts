@@ -1,7 +1,7 @@
-import { createApp } from "./app.js";
-import { config } from "./config.js";
-import { pool } from "./db.js";
-import { logger } from "./logger.js";
+import { createApp } from "../http/app.js";
+import { config } from "../platform/config.js";
+import { pool } from "../platform/db.js";
+import { logger } from "../platform/logger.js";
 const server = createApp().listen(config.PORT, () =>
   logger.info({ step: "api_started", port: config.PORT }),
 );

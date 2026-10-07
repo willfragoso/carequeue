@@ -1,5 +1,5 @@
 import amqp, { type ConfirmChannel, type ChannelModel } from "amqplib";
-import { config } from "./config.js";
+import { config } from "../platform/config.js";
 import { retryDelay, retryQueue } from "./retries.js";
 export const queues = {
   main: "carequeue.case-created",

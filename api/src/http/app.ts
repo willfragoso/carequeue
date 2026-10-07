@@ -1,9 +1,9 @@
 import express from "express";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { pool } from "./db.js";
-import { logger } from "./logger.js";
-import { statusSchema } from "./domain.js";
+import { pool } from "../platform/db.js";
+import { logger } from "../platform/logger.js";
+import { statusSchema } from "../cases/domain.js";
 import {
   createCase,
   getCase,
@@ -13,8 +13,8 @@ import {
   history,
   notifications,
   HttpError,
-} from "./cases.js";
-import { operations, delivery } from "./operations.js";
+} from "../cases/cases.js";
+import { operations, delivery } from "../operations/operations.js";
 export function createApp() {
   const app = express();
   app.disable("x-powered-by");

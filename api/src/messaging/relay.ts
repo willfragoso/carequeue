@@ -1,6 +1,6 @@
-import { transaction } from "./db.js";
-import { logger } from "./logger.js";
-import type { CaseEvent } from "./domain.js";
+import { transaction } from "../platform/db.js";
+import { logger } from "../platform/logger.js";
+import type { CaseEvent } from "../cases/domain.js";
 export async function relayOne(publish: (event: CaseEvent) => Promise<void>) {
   const event = await transaction(async (client) => {
     const result = await client.query(

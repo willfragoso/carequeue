@@ -94,18 +94,18 @@ pnpm install --frozen-lockfile
 cp .env.example .env
 docker compose up -d postgres rabbitmq
 pnpm build
-node --env-file=.env apps/api/dist/src/migrate.js
-node --env-file=.env apps/api/dist/src/api.js
+node --env-file=.env api/dist/src/entrypoints/migrate.js
+node --env-file=.env api/dist/src/entrypoints/api.js
 # In separate terminals:
-node --env-file=.env apps/api/dist/src/publisher.js
-node --env-file=.env apps/api/dist/src/worker.js
+node --env-file=.env api/dist/src/entrypoints/publisher.js
+node --env-file=.env api/dist/src/entrypoints/worker.js
 ```
 
 On PowerShell use `Copy-Item .env.example .env`. The application validates environment variables at startup. Scripts `pnpm start`, `pnpm publisher`, `pnpm worker` and `pnpm migrate` expect variables to be set in the shell; they do not implicitly load .env.
 
 ## HTTP contract
 
-The full [OpenAPI 3.1 specification](openapi.json) includes all routes. Responses use camelCase, a `data` wrapper, and errors use `{error: {code, message, correlationId}}`. Validation errors also have sanitized path/code details. Lists use deterministic newest-first ordering and bounded page sizes (1–100); the history is oldest-first.
+The full [OpenAPI 3.1 specification](api/openapi.json) includes all routes. Responses use camelCase, a `data` wrapper, and errors use `{error: {code, message, correlationId}}`. Validation errors also have sanitized path/code details. Lists use deterministic newest-first ordering and bounded page sizes (1–100); the history is oldest-first.
 
 | Method | Path                                      | Result                                      |
 | ------ | ----------------------------------------- | ------------------------------------------- |
@@ -311,9 +311,9 @@ Known frontend limitations: no login, no control of Docker from the browser, no 
 
 ## Workspace organization and protected main
 
-The project is a pnpm workspace: apps/api owns Express, PostgreSQL, RabbitMQ, migrations and backend tests; apps/web owns React, Vite and browser assets. Each application has its own package.json, dependencies and build. The root keeps orchestration, E2E tests, lint/format tooling and one lockfile. Docker deploys only the API package and its production dependencies, so frontend dependencies do not enter the API image.
+The project is a pnpm workspace: api/ owns Express, PostgreSQL, RabbitMQ, migrations and backend tests; web/ owns React, Vite and browser assets. Each application has its own package.json, dependencies and build. The root keeps orchestration, E2E tests, lint/format tooling and one lockfile. Docker deploys only the API package and its production dependencies, so frontend dependencies do not enter the API image.
 
-Root commands remain pnpm build, pnpm typecheck, pnpm lint, pnpm test and pnpm test:integration. Use pnpm --filter @carequeue/api build or pnpm --filter @carequeue/web build to build one application. Backend compiled entrypoints on the host are now under apps/api/dist/src; container entrypoints remain /app/dist/src.
+Root commands remain pnpm build, pnpm typecheck, pnpm lint, pnpm test and pnpm test:integration. Use pnpm --filter @carequeue/api build or pnpm --filter @carequeue/web build to build one application. Backend compiled entrypoints are under dist/src/entrypoints (api/dist/src/entrypoints on the host, /app/dist/src/entrypoints in the container). The API source is grouped by responsibility: entrypoints (one file per process), http, cases (domain), messaging (outbox relay, broker, consumer, retries), operations and platform (config, database, logger, migrations).
 
 The GitHub repository is now willfragoso/carequeue. Existing carequeue-api links redirect; the local checkout has also been renamed to `D:\Projetos\CAREQUEUE\carequeue`. The default main branch contains the initial stable API commit. Pending evolution PRs have not been merged: PR #1 targets main, and subsequent PRs retain their dependency chain. The workspace PR follows the frontend PR.
 

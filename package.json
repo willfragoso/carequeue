@@ -17,7 +17,7 @@
     "publisher": "pnpm --filter @carequeue/api publisher",
     "worker": "pnpm --filter @carequeue/api worker",
     "migrate": "pnpm --filter @carequeue/api migrate",
-    "format": "prettier --write apps tests *.ts *.json *.js *.yaml README.md .github/workflows/*.yml",
+    "format": "prettier --write api web tests *.ts *.json *.js *.yaml README.md .github/workflows/*.yml",
     "dev:frontend": "pnpm --filter @carequeue/web dev",
     "test:e2e": "playwright test"
   },
