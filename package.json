@@ -18,6 +18,8 @@
     "worker": "pnpm --filter @carequeue/api worker",
     "migrate": "pnpm --filter @carequeue/api migrate",
     "format": "prettier --write api web tests *.ts *.json *.js *.yaml README.md .github/workflows/*.yml",
+    "generate:api": "pnpm --filter @carequeue/web generate:api",
+    "check:api-types": "pnpm generate:api && git diff --exit-code -- web/src/app/core/api.gen.ts",
     "dev:frontend": "pnpm --filter @carequeue/web dev",
     "test:e2e": "playwright test"
   },

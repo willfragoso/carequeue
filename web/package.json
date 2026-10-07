@@ -9,6 +9,7 @@
     "ng": "ng",
     "dev": "ng serve",
     "build": "ng build",
+    "generate:api": "openapi-typescript ../api/openapi.json -o src/app/core/api.gen.ts",
     "typecheck": "ngc -p tsconfig.app.json --noEmit",
     "test": "ng test --no-watch"
   },
@@ -27,6 +28,7 @@
     "@angular/compiler-cli": "^22.2.0",
     "@types/node": "^24.0.0",
     "jsdom": "^30.0.0",
+    "openapi-typescript": "7.13.0",
     "typescript": "~6.0.3",
     "vitest": "^5.0.0"
   }

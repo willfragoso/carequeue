@@ -123,7 +123,7 @@
             "name": "status",
             "in": "query",
             "schema": {
-              "enum": ["OPEN", "TRIAGE", "ASSIGNED", "RESOLVED"]
+              "$ref": "#/components/schemas/Status"
             }
           },
           {
@@ -181,55 +181,10 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "type": "object",
-                      "required": ["data", "pagination"],
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Case"
-                          }
-                        },
-                        "pagination": {
-                          "type": "object",
-                          "properties": {
-                            "page": {
-                              "type": "integer"
-                            },
-                            "pageSize": {
-                              "type": "integer"
-                            }
-                          },
-                          "required": ["page", "pageSize"]
-                        }
-                      }
+                      "$ref": "#/components/schemas/CaseListOffset"
                     },
                     {
-                      "type": "object",
-                      "required": ["data", "pagination"],
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Case"
-                          }
-                        },
-                        "pagination": {
-                          "type": "object",
-                          "required": ["mode", "pageSize", "nextCursor"],
-                          "properties": {
-                            "mode": {
-                              "const": "cursor"
-                            },
-                            "pageSize": {
-                              "type": "integer"
-                            },
-                            "nextCursor": {
-                              "type": ["string", "null"]
-                            }
-                          }
-                        }
-                      }
+                      "$ref": "#/components/schemas/CaseListCursor"
                     }
                   ]
                 }
@@ -365,7 +320,7 @@
                 "required": ["status"],
                 "properties": {
                   "status": {
-                    "enum": ["OPEN", "TRIAGE", "ASSIGNED", "RESOLVED"]
+                    "$ref": "#/components/schemas/Status"
                   }
                 }
               }
@@ -474,27 +429,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "description": "PostgreSQL bigint serialized as string"
-                          },
-                          "fromStatus": {
-                            "type": ["string", "null"]
-                          },
-                          "toStatus": {
-                            "enum": ["OPEN", "TRIAGE", "ASSIGNED", "RESOLVED"]
-                          },
-                          "correlationId": {
-                            "type": "string",
-                            "format": "uuid"
-                          },
-                          "createdAt": {
-                            "type": "string",
-                            "format": "date-time"
-                          }
-                        }
+                        "$ref": "#/components/schemas/HistoryEntry"
                       }
                     }
                   }
@@ -569,24 +504,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "format": "uuid"
-                          },
-                          "eventId": {
-                            "type": "string",
-                            "format": "uuid"
-                          },
-                          "kind": {
-                            "const": "CASE_RECEIVED"
-                          },
-                          "createdAt": {
-                            "type": "string",
-                            "format": "date-time"
-                          }
-                        }
+                        "$ref": "#/components/schemas/Notification"
                       }
                     }
                   }
@@ -707,58 +625,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": ["data"],
                   "properties": {
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "observedAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "database": {
-                          "const": "available"
-                        },
-                        "cases": {
-                          "type": "integer"
-                        },
-                        "notifications": {
-                          "type": "integer"
-                        },
-                        "outbox": {
-                          "type": "object",
-                          "properties": {
-                            "pending": {
-                              "type": "integer"
-                            },
-                            "published": {
-                              "type": "integer"
-                            },
-                            "oldestPendingSeconds": {
-                              "type": ["number", "null"]
-                            }
-                          }
-                        },
-                        "broker": {
-                          "type": "object",
-                          "properties": {
-                            "status": {
-                              "enum": ["available", "unavailable"]
-                            },
-                            "ready": {
-                              "type": ["integer", "null"]
-                            },
-                            "consumers": {
-                              "type": ["integer", "null"]
-                            },
-                            "retryReady": {
-                              "type": ["integer", "null"]
-                            },
-                            "deadLetters": {
-                              "type": ["integer", "null"]
-                            }
-                          }
-                        }
-                      }
+                      "$ref": "#/components/schemas/Operations"
                     }
                   }
                 }
@@ -799,43 +669,12 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": ["data"],
                   "properties": {
                     "data": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "eventId": {
-                            "type": "string",
-                            "format": "uuid"
-                          },
-                          "correlationId": {
-                            "type": "string",
-                            "format": "uuid"
-                          },
-                          "eventType": {
-                            "const": "CaseCreated.v1"
-                          },
-                          "createdAt": {
-                            "type": "string",
-                            "format": "date-time"
-                          },
-                          "publishedAt": {
-                            "type": ["string", "null"],
-                            "format": "date-time"
-                          },
-                          "notificationSavedAt": {
-                            "type": ["string", "null"],
-                            "format": "date-time"
-                          },
-                          "state": {
-                            "enum": [
-                              "pendingPublication",
-                              "awaitingNotification",
-                              "completed"
-                            ]
-                          }
-                        }
+                        "$ref": "#/components/schemas/Delivery"
                       }
                     }
                   }
@@ -905,7 +744,7 @@
             "maxLength": 2000
           },
           "status": {
-            "enum": ["OPEN", "TRIAGE", "ASSIGNED", "RESOLVED"]
+            "$ref": "#/components/schemas/Status"
           },
           "createdAt": {
             "type": "string",
@@ -952,6 +791,226 @@
             }
           }
         }
+      },
+      "Status": {
+        "enum": ["OPEN", "TRIAGE", "ASSIGNED", "RESOLVED"]
+      },
+      "CaseListOffset": {
+        "type": "object",
+        "required": ["data", "pagination"],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Case"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer"
+              },
+              "pageSize": {
+                "type": "integer"
+              }
+            },
+            "required": ["page", "pageSize"]
+          }
+        }
+      },
+      "CaseListCursor": {
+        "type": "object",
+        "required": ["data", "pagination"],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Case"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "required": ["mode", "pageSize", "nextCursor"],
+            "properties": {
+              "mode": {
+                "const": "cursor"
+              },
+              "pageSize": {
+                "type": "integer"
+              },
+              "nextCursor": {
+                "type": ["string", "null"]
+              }
+            }
+          }
+        }
+      },
+      "HistoryEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "PostgreSQL bigint serialized as string"
+          },
+          "fromStatus": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Status"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "toStatus": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "correlationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "fromStatus",
+          "toStatus",
+          "correlationId",
+          "createdAt"
+        ]
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "const": "CASE_RECEIVED"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["id", "eventId", "kind", "createdAt"]
+      },
+      "Delivery": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "correlationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventType": {
+            "const": "CaseCreated.v1"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "publishedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "notificationSavedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "state": {
+            "enum": ["pendingPublication", "awaitingNotification", "completed"]
+          }
+        },
+        "required": [
+          "eventId",
+          "correlationId",
+          "eventType",
+          "createdAt",
+          "publishedAt",
+          "notificationSavedAt",
+          "state"
+        ]
+      },
+      "Operations": {
+        "type": "object",
+        "properties": {
+          "observedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "database": {
+            "const": "available"
+          },
+          "cases": {
+            "type": "integer"
+          },
+          "notifications": {
+            "type": "integer"
+          },
+          "outbox": {
+            "type": "object",
+            "properties": {
+              "pending": {
+                "type": "integer"
+              },
+              "published": {
+                "type": "integer"
+              },
+              "oldestPendingSeconds": {
+                "type": ["number", "null"]
+              }
+            },
+            "required": ["pending", "published", "oldestPendingSeconds"]
+          },
+          "broker": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "enum": ["available", "unavailable"]
+              },
+              "ready": {
+                "type": ["integer", "null"]
+              },
+              "consumers": {
+                "type": ["integer", "null"]
+              },
+              "retryReady": {
+                "type": ["integer", "null"]
+              },
+              "deadLetters": {
+                "type": ["integer", "null"]
+              }
+            },
+            "required": [
+              "status",
+              "ready",
+              "consumers",
+              "retryReady",
+              "deadLetters"
+            ]
+          }
+        },
+        "required": [
+          "observedAt",
+          "database",
+          "cases",
+          "notifications",
+          "outbox",
+          "broker"
+        ]
       }
     }
   }
