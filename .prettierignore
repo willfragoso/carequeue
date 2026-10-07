@@ -4,3 +4,4 @@ playwright-report/
 test-results/
 pnpm-lock.yaml
 **/.angular/
+web/src/app/core/api.gen.ts

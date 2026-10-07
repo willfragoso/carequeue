@@ -270,6 +270,14 @@ pnpm dev:frontend
 # Open http://localhost:4200 (the Angular dev server proxies /api and /health to localhost:3000)
 ```
 
+The frontend's wire types are generated from [api/openapi.json](api/openapi.json), the source of truth for the HTTP contract, into `web/src/app/core/api.gen.ts` (committed, never edited by hand). After changing the contract run:
+
+```sh
+pnpm generate:api
+```
+
+CI runs `pnpm check:api-types`, which regenerates the file and fails if it differs from the committed one, so the spec and the frontend types cannot drift apart silently. Request/response shapes were also validated against the running API (all documented success and error responses matched the spec).
+
 The root `pnpm build`, `pnpm typecheck`, `pnpm lint` and `pnpm test` include the frontend (Angular compiler template type-checking and Vitest unit tests). To run browser tests against the local Compose stack:
 
 ```sh

@@ -4,6 +4,7 @@ export default tseslint.config(
     ignores: [
       "**/dist/**",
       "**/.angular/**",
+      "**/*.gen.ts",
       "**/node_modules/**",
       "playwright-report/**",
       "test-results/**",
