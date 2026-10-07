@@ -267,7 +267,7 @@ For frontend development with the API running:
 
 ```sh
 pnpm dev:frontend
-# Open http://localhost:5173 (the Angular dev server proxies /api and /health to localhost:3000)
+# Open http://localhost:4200 (the Angular dev server proxies /api and /health to localhost:3000)
 ```
 
 The root `pnpm build`, `pnpm typecheck`, `pnpm lint` and `pnpm test` include the frontend (Angular compiler template type-checking and Vitest unit tests). To run browser tests against the local Compose stack:
