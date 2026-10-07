@@ -1,0 +1,114 @@
+@if (item(); as item) {
+<aside class="panel detail-panel" aria-label="Detalhes da solicitação">
+  <div class="panel-kicker">SOLICITAÇÃO SELECIONADA</div>
+  <div class="detail-title">
+    <h2>{{ item.title }}</h2>
+    <cq-status-badge [status]="item.status" />
+  </div>
+  <p class="description">{{ item.description }}</p>
+  <div class="status-track">
+    @for (status of statuses; track status) {
+    <span [class]="reached(status) ? 'reached' : ''">{{ labels[status] }}</span>
+    }
+  </div>
+  <button
+    type="button"
+    class="primary advance-button"
+    [disabled]="changing() || !next() || !!current.error()"
+    (click)="advance()"
+  >
+    {{ changing() ? "Atualizando…" : next() ? "Avançar para " +
+    labels[next()!].toLowerCase() : "Solicitação resolvida" }}
+    <span aria-hidden="true">→</span>
+  </button>
+  <cq-error-notice [error]="mutationError() ?? current.error()" />
+  <div
+    class="detail-tabs"
+    role="tablist"
+    aria-label="Informações da solicitação"
+  >
+    @if (showDelivery()) {
+    <button
+      role="tab"
+      [attr.aria-selected]="tab() === 'delivery'"
+      (click)="tab.set('delivery')"
+    >
+      Entrega do evento
+    </button>
+    }
+    <button
+      role="tab"
+      [attr.aria-selected]="tab() === 'history'"
+      (click)="tab.set('history')"
+    >
+      Histórico <span>{{ history.data()?.data.length ?? "—" }}</span>
+    </button>
+  </div>
+  @if (showDelivery() && tab() === "delivery") {
+  <section role="tabpanel" aria-label="Entrega do evento">
+    <cq-delivery-flow [event]="event()" />
+    <cq-error-notice [error]="delivery.error() ?? notifications.error()" />
+    @if (!event() && !delivery.loading() && !delivery.error()) {
+    <p class="quiet">Nenhum evento registrado.</p>
+    } @if (event(); as event) {
+    <div
+      [class]="
+              'notification-box ' +
+              (event.notificationSavedAt ? 'delivered' : 'pending')
+            "
+    >
+      <span class="notification-icon" aria-hidden="true"
+        >{{ event.notificationSavedAt ? "✓" : "↻" }}</span
+      >
+      <div>
+        <strong
+          >{{ event.notificationSavedAt ? "Notificação simulada salva" :
+          event.publishedAt ? "Aguardando o worker" : "Evento aguardando
+          publicação" }}</strong
+        >
+        <p>
+          {{ event.notificationSavedAt ? (notifications.data()?.data.length ??
+          1) + " notificação(ões) · efeito protegido por eventId" : "A
+          solicitação já está persistida. A entrega continua em segundo plano."
+          }}
+        </p>
+      </div>
+    </div>
+    <cq-copy-id label="eventId" [value]="event.eventId" />
+    <cq-copy-id label="correlationId" [value]="event.correlationId" />
+    }
+  </section>
+  } @else {
+  <section role="tabpanel" aria-label="Histórico de status">
+    <cq-error-notice [error]="history.error()" />
+    <ol class="history-list">
+      @for (entry of history.data()?.data ?? []; track entry.id) {
+      <li>
+        <i></i>
+        <div>
+          <strong>
+            {{ entry.fromStatus ? labels[entry.fromStatus] + " → " : "" }}{{
+            labels[entry.toStatus] }}
+          </strong>
+          <time>{{ entry.createdAt | cqTime }}</time>
+          <code>{{ entry.correlationId }}</code>
+        </div>
+      </li>
+      }
+    </ol>
+  </section>
+  }
+  <div class="detail-footer">
+    <span>Atualização automática a cada 3 s</span>
+    <button class="text-button" (click)="refreshAll()">Atualizar</button>
+  </div>
+</aside>
+} @else {
+<aside class="panel detail-panel">
+  <cq-error-notice [error]="current.error()" />
+  <p class="empty-state">
+    {{ current.loading() ? "Carregando solicitação…" : "A solicitação não está
+    disponível." }}
+  </p>
+</aside>
+}

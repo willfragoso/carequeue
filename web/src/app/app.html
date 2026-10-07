@@ -1,0 +1,92 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/" aria-label="CareQueue início">
+      <span class="brand-mark">C<span></span></span>
+      <div>CareQueue<small>FILA DE ATENDIMENTO</small></div>
+    </a>
+    <div class="workspace-tag">
+      <span class="dot green"></span>
+      Ambiente local
+    </div>
+    <nav aria-label="Navegação principal">
+      <span class="nav-label">WORKSPACE</span>
+      <button routerLink="/solicitacoes" routerLinkActive="active">
+        <span aria-hidden="true">▤</span>Solicitações
+        <span class="nav-count"
+          >{{ store.cases.data()?.data.length ?? "—" }}</span
+        >
+      </button>
+      <button routerLink="/mapa" routerLinkActive="active">
+        <span aria-hidden="true">▧</span>Mapa
+      </button>
+      <button routerLink="/fluxo" routerLinkActive="active">
+        <span aria-hidden="true">⇄</span>Fluxo
+      </button>
+      <button routerLink="/glossario" routerLinkActive="active">
+        <span aria-hidden="true">?</span>Glossário
+      </button>
+    </nav>
+    <div class="sidebar-note">
+      <span>◈</span>
+      <strong>Somente dados sintéticos</strong>
+      <p>
+        Uma fila fictícia para aceitar solicitações, acompanhar triagem e
+        demonstrar entrega confiável.
+      </p>
+    </div>
+    <div class="sidebar-footer">
+      PRODUTO FICTÍCIO<span>Node.js · PostgreSQL · RabbitMQ</span>
+    </div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <span>Workspace <b>/</b> {{ meta().crumb }}</span>
+      <div class="topbar-status">
+        <i [class]="store.productAvailable() ? 'dot green' : 'dot amber'"></i>
+        {{ store.productAvailable() ? "API disponível" : "API sem leitura" }}
+        <span class="demo-badge">DEMO</span>
+      </div>
+    </header>
+    <div class="main-content">
+      <section class="page-heading">
+        <div>
+          <span class="eyebrow">TRIAGEM &amp; ACOMPANHAMENTO</span>
+          <h1>{{ meta().heading }}</h1>
+          <p>{{ meta().summary }}</p>
+        </div>
+        <button class="primary new-button" (click)="store.showNew.set(true)">
+          <span aria-hidden="true">＋</span>Nova solicitação
+        </button>
+      </section>
+      @if (store.view() === "flow") {
+      <cq-metrics
+        [data]="store.snapshot()"
+        [error]="store.operations.error()"
+      />
+      <cq-error-notice [error]="store.operations.error()" />
+      } @if (store.notice(); as notice) {
+      <div class="success-notice" role="status">
+        {{ notice }}
+        <button
+          class="icon-button"
+          aria-label="Dispensar mensagem"
+          (click)="store.notice.set('')"
+        >
+          ×
+        </button>
+      </div>
+      }
+      <router-outlet />
+      <footer class="page-footer">
+        <span>CareQueue · demonstração com dados sintéticos</span>
+        <span>{{ meta().footer }}</span>
+      </footer>
+    </div>
+  </main>
+  @if (store.showNew()) {
+  <cq-new-case-dialog
+    (closed)="store.showNew.set(false)"
+    (created)="store.caseCreated($event)"
+  />
+  }
+</div>

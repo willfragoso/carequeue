@@ -9,10 +9,12 @@ const { pool, transaction } = await import("../../src/platform/db.js");
 const { createCase, changeStatus } = await import("../../src/cases/cases.js");
 const { createApp } = await import("../../src/http/app.js");
 const { relayOne } = await import("../../src/messaging/relay.js");
-const { saveNotification, handleMessage } = await import("../../src/messaging/consumer.js");
+const { saveNotification, handleMessage } =
+  await import("../../src/messaging/consumer.js");
 const { connectBroker, publishConfirmed, queues } =
   await import("../../src/messaging/broker.js");
-const { retryQueues, retryDelay } = await import("../../src/messaging/retries.js");
+const { retryQueues, retryDelay } =
+  await import("../../src/messaging/retries.js");
 const { config } = await import("../../src/platform/config.js");
 let broker: Awaited<ReturnType<typeof connectBroker>>;
 async function next(queue: string): Promise<GetMessage> {

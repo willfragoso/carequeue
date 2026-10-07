@@ -960,7 +960,7 @@ td time {
   gap: 12px;
   margin-top: 22px;
 }
-.architecture-layout {
+.flow-layout {
   display: grid;
   gap: 21px;
 }
@@ -970,9 +970,12 @@ td time {
   gap: 21px;
   align-items: start;
 }
-.architecture-column {
+.flow-column {
   display: grid;
   gap: 21px;
+}
+.systems-map-page {
+  display: grid;
 }
 .architecture-side {
   display: grid;
@@ -1480,7 +1483,7 @@ td time {
   }
   .sidebar nav {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 7px;
     margin-top: 20px;
   }
@@ -1489,9 +1492,9 @@ td time {
     min-width: 0;
     justify-content: center;
     margin: 0;
-    padding: 10px 7px;
-    font-size: 10px;
-    gap: 6px;
+    padding: 10px 5px;
+    font-size: 9px;
+    gap: 4px;
   }
   nav button > span:first-child {
     font-size: 14px;
@@ -1630,4 +1633,20 @@ td time {
   * {
     transition: none !important;
   }
+}
+
+/* Angular component host elements must not take part in layout. */
+cq-case-details,
+cq-copy-id,
+cq-delivery-flow,
+cq-architecture-canvas,
+cq-error-notice,
+cq-cases-page,
+cq-flow-page,
+cq-glossary-page,
+cq-metrics,
+cq-new-case-dialog,
+cq-status-badge,
+cq-systems-map-page {
+  display: contents;
 }

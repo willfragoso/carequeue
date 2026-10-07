@@ -1,0 +1,64 @@
+<dialog #dialog class="new-case-dialog" (cancel)="cancel($event)">
+  <div class="dialog-heading">
+    <div>
+      <span class="eyebrow">DADOS SINTÉTICOS</span>
+      <h2>Nova solicitação</h2>
+    </div>
+    <button
+      type="button"
+      class="icon-button"
+      aria-label="Fechar formulário"
+      [disabled]="busy()"
+      (click)="closed.emit()"
+    >
+      ×
+    </button>
+  </div>
+  <p>Crie um atendimento fictício e acompanhe cada etapa da entrega.</p>
+  <form (submit)="submit($event)">
+    <label>
+      Título
+      <input
+        autofocus
+        required
+        maxlength="120"
+        [value]="title()"
+        (input)="title.set(text($event))"
+        placeholder="Ex.: Acompanhamento fictício A"
+        [disabled]="busy()"
+      />
+    </label>
+    <label>
+      Descrição
+      <textarea
+        required
+        maxlength="2000"
+        rows="4"
+        [value]="description()"
+        (input)="description.set(text($event))"
+        placeholder="Descreva apenas uma situação inventada."
+        [disabled]="busy()"
+      ></textarea>
+    </label>
+    <div class="synthetic-note">
+      Use somente informações inventadas. Nenhum contato externo será feito.
+    </div>
+    <cq-error-notice [error]="error()" />
+    <div class="dialog-actions">
+      <button
+        type="button"
+        class="secondary"
+        [disabled]="busy()"
+        (click)="fillExample()"
+      >
+        Preencher exemplo
+      </button>
+      <button
+        class="primary"
+        [disabled]="busy() || !title().trim() || !description().trim()"
+      >
+        {{ busy() ? "Salvando…" : "Criar solicitação" }}
+      </button>
+    </div>
+  </form>
+</dialog>
