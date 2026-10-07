@@ -1,0 +1,38 @@
+<div class="metrics">
+  <article>
+    <span>Solicitações registradas</span>
+    <strong>{{ snapshot()?.cases ?? "—" }}</strong>
+    <small>Persistidas no PostgreSQL</small>
+  </article>
+  <article>
+    <span>Eventos pendentes</span>
+    <strong [class]="data()?.outbox.pending ? 'text-amber' : ''"
+      >{{ snapshot()?.outbox.pending ?? "—" }}</strong
+    >
+    <small>
+      {{ oldestPendingSeconds() !== null ? "Mais antigo há " +
+      oldestPendingSeconds() + " s" : "Aguardando publicação" }}
+    </small>
+  </article>
+  <article>
+    <span>RabbitMQ</span>
+    <strong class="metric-status">
+      <i
+        [class]="
+          snapshot()?.broker.status === 'available' ? 'dot green' : 'dot amber'
+        "
+      ></i>
+      {{ snapshot() ? snapshot()!.broker.status === "available" ? "Conectado" :
+      "Indisponível" : "Sem leitura" }}
+    </strong>
+    <small>
+      {{ snapshot()?.broker.consumers != null ? snapshot()!.broker.consumers + "
+      consumidor(es) ativo(s)" : "A API pode persistir sem o broker" }}
+    </small>
+  </article>
+  <article>
+    <span>Notificações salvas</span>
+    <strong>{{ snapshot()?.notifications ?? "—" }}</strong>
+    <small>Um efeito por eventId</small>
+  </article>
+</div>

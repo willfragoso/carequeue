@@ -20,7 +20,7 @@ These terms appear in the project and in the demo UI:
 | ----------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------- |
 | API                     | A server entry point that other programs call.                 | Receives requests to create cases, list cases and change status.  |
 | Backend                 | The server-side part that owns rules, data and integrations.   | Express, PostgreSQL, RabbitMQ, publisher and worker.              |
-| Frontend                | The browser screen used by a person.                           | The React console at http://localhost:8080.                       |
+| Frontend                | The browser screen used by a person.                           | The Angular console at http://localhost:8080.                     |
 | PostgreSQL              | A relational database.                                         | Stores cases, history, outbox events and simulated notifications. |
 | RabbitMQ                | A message broker.                                              | Delivers CaseCreated.v1 from the publisher to the worker.         |
 | Broker                  | A service that receives and delivers messages.                 | RabbitMQ is the broker in this project.                           |
@@ -45,13 +45,13 @@ These terms appear in the project and in the demo UI:
 
 ## Stack and architecture
 
-React 19, Vite 8, Node.js 24 LTS, TypeScript 6, Express 5, PostgreSQL 18, RabbitMQ 4.3, amqplib 2, Zod 4, Pino 10, Vitest 5, ESLint 10, and pnpm 11.19.0. The committed lockfile fixes dependency resolution. TypeScript 6 is selected because typescript-eslint currently supports versions below 6.1; TypeScript 7 is not compatible with this lint configuration.
+Angular 22, Node.js 24 LTS, TypeScript 6, Express 5, PostgreSQL 18, RabbitMQ 4.3, amqplib 2, Zod 4, Pino 10, Vitest 5, ESLint 10, and pnpm 11.19.0. The committed lockfile fixes dependency resolution. TypeScript 6 is selected because typescript-eslint currently supports versions below 6.1; TypeScript 7 is not compatible with this lint configuration. Angular 22 additionally requires TypeScript `>=6.0 <6.1`, so web/ pins `~6.0.3`; its CLI packages are pinned to 22.2.1 so they satisfy the repository's minimum release age policy, and pnpm `allowBuilds` explicitly denies dependency install scripts (the Angular toolchain does not need them).
 
 Official references: [Node releases](https://nodejs.org/en/about/previous-releases), [Express 5](https://expressjs.com/en/guide/migrating-5/), [PostgreSQL support](https://www.postgresql.org/support/versioning/), [RabbitMQ releases](https://www.rabbitmq.com/release-information), [confirms and acknowledgements](https://www.rabbitmq.com/docs/confirms), [typescript-eslint compatibility](https://typescript-eslint.io/users/dependency-versions/).
 
 ```mermaid
 flowchart LR
-  Client --> Frontend[React console / Nginx]
+  Client --> Frontend[Angular console / Nginx]
   Frontend --> API[Express API]
   API -->|one transaction| DB[(PostgreSQL: cases + history + outbox)]
   DB --> Relay[Outbox publisher]
@@ -254,21 +254,23 @@ GET /api/cases?pagination=cursor&pageSize=20 returns pagination.nextCursor. Supp
 
 ## Demonstration frontend
 
-The React + Vite + TypeScript console is available at **http://localhost:8080** after `docker compose up --build -d`. It shares the API origin through an Nginx proxy; the browser receives no database/broker credentials. All displayed delivery states and queue counts come from API responses, not timers or mock data.
+The Angular + TypeScript console (standalone components, signals, zoneless change detection, lazy-loaded routes) is available at **http://localhost:8080** after `docker compose up --build -d`. It shares the API origin through an Nginx proxy; the browser receives no database/broker credentials. All displayed delivery states and queue counts come from API responses, not timers or mock data.
 
 - **Solicitações**: product view for synthetic cases, filtering, cursor pagination, adjacent status transitions and status history.
-- **Arquitetura**: technical view for pending outbox events, RabbitMQ status, retry queues, DLQ counts and the stop/create/restart/replay walkthrough.
-- eventId, correlationId and notification delivery are visible in the architecture view. HTTP failures include their correlation ID.
+- **Mapa**: diagram of the running systems (console, API, publisher, worker, PostgreSQL, RabbitMQ).
+- **Fluxo**: technical view for pending outbox events, RabbitMQ status, retry queues, DLQ counts and the stop/create/restart/replay walkthrough.
+- **Glossário**: beginner glossary of the project terms.
+- eventId, correlationId and notification delivery are visible in the flow view. HTTP failures include their correlation ID.
 - Polling runs every three seconds without overlapping requests; changing selection/filter cancels obsolete requests. Network failures show unavailable data rather than invented zero counts.
 
 For frontend development with the API running:
 
 ```sh
 pnpm dev:frontend
-# Open http://localhost:5173 (Vite proxies /api and /health to localhost:3000)
+# Open http://localhost:5173 (the Angular dev server proxies /api and /health to localhost:3000)
 ```
 
-The root `pnpm build`, `pnpm typecheck` and `pnpm lint` include the frontend. To run browser tests against the local Compose stack:
+The root `pnpm build`, `pnpm typecheck`, `pnpm lint` and `pnpm test` include the frontend (Angular compiler template type-checking and Vitest unit tests). To run browser tests against the local Compose stack:
 
 ```sh
 pnpm exec playwright install chromium
@@ -311,7 +313,7 @@ Known frontend limitations: no login, no control of Docker from the browser, no 
 
 ## Workspace organization and protected main
 
-The project is a pnpm workspace: api/ owns Express, PostgreSQL, RabbitMQ, migrations and backend tests; web/ owns React, Vite and browser assets. Each application has its own package.json, dependencies and build. The root keeps orchestration, E2E tests, lint/format tooling and one lockfile. Docker deploys only the API package and its production dependencies, so frontend dependencies do not enter the API image.
+The project is a pnpm workspace: api/ owns Express, PostgreSQL, RabbitMQ, migrations and backend tests; web/ owns the Angular application and browser assets. Each application has its own package.json, dependencies and build. The root keeps orchestration, E2E tests, lint/format tooling and one lockfile. Docker deploys only the API package and its production dependencies, so frontend dependencies do not enter the API image.
 
 Root commands remain pnpm build, pnpm typecheck, pnpm lint, pnpm test and pnpm test:integration. Use pnpm --filter @carequeue/api build or pnpm --filter @carequeue/web build to build one application. Backend compiled entrypoints are under dist/src/entrypoints (api/dist/src/entrypoints on the host, /app/dist/src/entrypoints in the container). The API source is grouped by responsibility: entrypoints (one file per process), http, cases (domain), messaging (outbox relay, broker, consumer, retries), operations and platform (config, database, logger, migrations).
 

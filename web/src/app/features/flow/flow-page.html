@@ -1,0 +1,102 @@
+<div class="flow-layout">
+  <div class="reliability-grid">
+    <div class="flow-column">
+      <cq-architecture-canvas />
+      <section class="panel demo-guide">
+        <div class="panel-kicker">DEMONSTRAÇÃO GUIADA</div>
+        <h2>Veja a fila se recuperar.</h2>
+        <p class="quiet">
+          Pare o broker, crie uma solicitação e acompanhe a outbox publicar o
+          evento quando o RabbitMQ voltar.
+        </p>
+        <ol class="guide-list">
+          <li>
+            <span>01</span>
+            <div>
+              <h3>Interrompa o RabbitMQ</h3>
+              <p>No terminal do projeto:</p>
+              <code>docker compose stop rabbitmq</code>
+            </div>
+          </li>
+          <li>
+            <span>02</span>
+            <div>
+              <h3>Crie uma solicitação sintética</h3>
+              <p>A API persiste os dados e o evento na mesma transação.</p>
+              <button class="secondary" (click)="store.showNew.set(true)">
+                Criar durante a demonstração
+              </button>
+            </div>
+          </li>
+          <li>
+            <span>03</span>
+            <div>
+              <h3>Restaure o broker</h3>
+              <code>docker compose start rabbitmq</code>
+              <p>Acompanhe a notificação surgir no painel de detalhes.</p>
+            </div>
+          </li>
+          <li>
+            <span>04</span>
+            <div>
+              <h3>Repita a entrega</h3>
+              <p>
+                Use o eventId da solicitação selecionada. A quantidade de
+                notificações deve permanecer em um.
+              </p>
+              <code class="wrap-code"
+                >{{ delivery.data()?.data[0] ? "docker compose exec publisher
+                node dist/src/entrypoints/replay.js " +
+                delivery.data()!.data[0].eventId : "Selecione uma solicitação
+                para obter o eventId." }}</code
+              >
+            </div>
+          </li>
+        </ol>
+      </section>
+    </div>
+    <div class="architecture-side">
+      <section class="panel queue-panel">
+        <div class="panel-kicker">LEITURA DO BROKER</div>
+        <h2>Filas, sem efeitos externos.</h2>
+        <dl>
+          <div>
+            <dt>Prontas para consumo</dt>
+            <dd>{{ store.snapshot()?.broker.ready ?? "—" }}</dd>
+          </div>
+          <div>
+            <dt>Aguardando retry</dt>
+            <dd>{{ store.snapshot()?.broker.retryReady ?? "—" }}</dd>
+          </div>
+          <div>
+            <dt>Dead-letter queue</dt>
+            <dd>{{ store.snapshot()?.broker.deadLetters ?? "—" }}</dd>
+          </div>
+        </dl>
+        <p class="quiet">
+          Contagens instantâneas de mensagens prontas. Entregas em processamento
+          não estão incluídas.
+        </p>
+        <div class="delivery-contract">
+          <strong>At least once</strong>
+          <p>
+            Uma mensagem pode chegar novamente. O consumidor idempotente protege
+            a gravação da notificação.
+          </p>
+        </div>
+      </section>
+      @if (store.selectedId(); as id) {
+      <cq-case-details [id]="id" [showDelivery]="true" />
+      } @else {
+      <section class="panel selection-empty">
+        <span class="empty-icon">↗</span>
+        <h2>Selecione uma solicitação</h2>
+        <p>
+          Na aba Solicitações, escolha um item para acompanhar a entrega técnica
+          durante a demonstração.
+        </p>
+      </section>
+      }
+    </div>
+  </div>
+</div>

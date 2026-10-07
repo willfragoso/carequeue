@@ -1,0 +1,19 @@
+import { HttpClient } from "@angular/common/http";
+import { inject, Injectable } from "@angular/core";
+import { firstValueFrom } from "rxjs";
+import type { Case, Data, Status } from "./models";
+
+@Injectable({ providedIn: "root" })
+export class CasesApi {
+  private readonly http = inject(HttpClient);
+
+  create(input: { title: string; description: string }) {
+    return firstValueFrom(this.http.post<Data<Case>>("/api/cases", input));
+  }
+
+  changeStatus(id: string, status: Status) {
+    return firstValueFrom(
+      this.http.patch<Data<Case>>("/api/cases/" + id + "/status", { status }),
+    );
+  }
+}

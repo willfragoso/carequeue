@@ -1634,3 +1634,19 @@ td time {
     transition: none !important;
   }
 }
+
+/* Angular component host elements must not take part in layout. */
+cq-case-details,
+cq-copy-id,
+cq-delivery-flow,
+cq-architecture-canvas,
+cq-error-notice,
+cq-cases-page,
+cq-flow-page,
+cq-glossary-page,
+cq-metrics,
+cq-new-case-dialog,
+cq-status-badge,
+cq-systems-map-page {
+  display: contents;
+}
