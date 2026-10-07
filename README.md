@@ -276,7 +276,7 @@ The frontend's wire types are generated from [api/openapi.json](api/openapi.json
 pnpm generate:api
 ```
 
-CI runs `pnpm check:api-types`, which regenerates the file and fails if it differs from the committed one, so the spec and the frontend types cannot drift apart silently. Request/response shapes were also validated against the running API (all documented success and error responses matched the spec).
+CI runs `pnpm check:api-types`, which regenerates the file and fails if it differs from the committed one, so the spec and the frontend types cannot drift apart silently. The other side is covered by the contract test (`api/tests/integration/contract.integration.test.ts`, part of `pnpm test:integration`): it calls every operation through the real app and database and validates status, JSON body (Ajv, JSON Schema 2020-12 with formats) and the `x-correlation-id` header against `api/openapi.json`, including the main error responses (400, 404, 409, 413) and both broker states of `/api/operations`. It also fails when a documented operation has no contract case, so a new endpoint cannot be added to the spec untested. Not covered: the 500 and `/health/ready` 503 responses, which need injected failures.
 
 The root `pnpm build`, `pnpm typecheck`, `pnpm lint` and `pnpm test` include the frontend (Angular compiler template type-checking and Vitest unit tests). To run browser tests against the local Compose stack:
 

@@ -54,10 +54,7 @@
             "description": "Created",
             "headers": {
               "x-correlation-id": {
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
+                "$ref": "#/components/headers/CorrelationId"
               }
             },
             "content": {
@@ -82,6 +79,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "404": {
@@ -91,6 +93,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           },
@@ -102,6 +109,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "500": {
@@ -111,6 +123,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           }
@@ -170,10 +187,7 @@
             "description": "Success",
             "headers": {
               "x-correlation-id": {
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
+                "$ref": "#/components/headers/CorrelationId"
               }
             },
             "content": {
@@ -199,6 +213,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "404": {
@@ -209,6 +228,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "500": {
@@ -218,6 +242,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           }
@@ -243,10 +272,7 @@
             "description": "Success",
             "headers": {
               "x-correlation-id": {
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
+                "$ref": "#/components/headers/CorrelationId"
               }
             },
             "content": {
@@ -271,6 +297,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "404": {
@@ -281,6 +312,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "500": {
@@ -290,6 +326,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           }
@@ -332,10 +373,7 @@
             "description": "Success",
             "headers": {
               "x-correlation-id": {
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
+                "$ref": "#/components/headers/CorrelationId"
               }
             },
             "content": {
@@ -360,6 +398,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "404": {
@@ -369,6 +412,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           },
@@ -380,6 +428,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "500": {
@@ -389,6 +442,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           }
@@ -414,10 +472,7 @@
             "description": "Success",
             "headers": {
               "x-correlation-id": {
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
+                "$ref": "#/components/headers/CorrelationId"
               }
             },
             "content": {
@@ -445,6 +500,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "404": {
@@ -455,6 +515,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "500": {
@@ -464,6 +529,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           }
@@ -489,10 +559,7 @@
             "description": "Success",
             "headers": {
               "x-correlation-id": {
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
+                "$ref": "#/components/headers/CorrelationId"
               }
             },
             "content": {
@@ -520,6 +587,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "404": {
@@ -530,6 +602,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "500": {
@@ -539,6 +616,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           }
@@ -553,10 +635,7 @@
             "description": "Success",
             "headers": {
               "x-correlation-id": {
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
+                "$ref": "#/components/headers/CorrelationId"
               }
             },
             "content": {
@@ -583,10 +662,7 @@
             "description": "Success",
             "headers": {
               "x-correlation-id": {
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
+                "$ref": "#/components/headers/CorrelationId"
               }
             },
             "content": {
@@ -609,6 +685,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           }
@@ -633,6 +714,11 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "500": {
@@ -642,6 +728,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           }
@@ -680,6 +771,11 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "400": {
@@ -689,6 +785,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           },
@@ -700,6 +801,11 @@
                   "$ref": "#/components/schemas/Error"
                 }
               }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
             }
           },
           "500": {
@@ -709,6 +815,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            },
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
               }
             }
           }
@@ -1011,6 +1122,14 @@
           "outbox",
           "broker"
         ]
+      }
+    },
+    "headers": {
+      "CorrelationId": {
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
       }
     }
   }
