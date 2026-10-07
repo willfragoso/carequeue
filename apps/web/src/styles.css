@@ -74,9 +74,10 @@ button:hover:not(:disabled) {
   display: grid;
   grid-template-columns: 218px minmax(0, 1fr);
   min-height: 100vh;
+  background: linear-gradient(90deg, #12393e 0 218px, #f4f7f7 218px 100%);
 }
 .sidebar {
-  background: #12393e;
+  background: transparent;
   color: #d8e6e5;
   position: sticky;
   top: 0;
@@ -959,15 +960,23 @@ td time {
   gap: 12px;
   margin-top: 22px;
 }
+.architecture-layout {
+  display: grid;
+  gap: 21px;
+}
 .reliability-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(330px, 1fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
   gap: 21px;
   align-items: start;
 }
 .architecture-column {
   display: grid;
   gap: 21px;
+}
+.architecture-side {
+  display: grid;
+  gap: 20px;
 }
 .systems-map-panel {
   padding: 27px;
@@ -978,7 +987,7 @@ td time {
 }
 .systems-board {
   position: relative;
-  min-height: 430px;
+  min-height: 520px;
   overflow: hidden;
   border: 1px solid #dfe9e2;
   border-radius: 8px;
@@ -1021,27 +1030,27 @@ td time {
   text-transform: uppercase;
 }
 .zone-client {
-  top: 82px;
-  left: 24px;
-  width: 160px;
+  top: 160px;
+  left: 4%;
+  width: 18%;
   min-height: 118px;
 }
 .zone-api {
-  top: 58px;
-  left: 335px;
-  width: 160px;
+  top: 95px;
+  left: 35%;
+  width: 20%;
   min-height: 250px;
 }
 .zone-data {
-  top: 98px;
-  left: 646px;
-  width: 126px;
+  top: 120px;
+  left: 68%;
+  width: 15%;
   min-height: 91px;
 }
 .zone-broker {
-  top: 199px;
-  left: 646px;
-  width: 126px;
+  top: 270px;
+  left: 68%;
+  width: 15%;
   min-height: 91px;
 }
 .system-card {
@@ -1088,9 +1097,9 @@ td time {
 }
 .systems-legend {
   position: absolute;
-  right: 24px;
-  top: 70px;
-  width: 178px;
+  right: 3.5%;
+  top: 95px;
+  width: 190px;
   margin: 0;
   padding: 15px 15px 13px;
   list-style: none;
@@ -1260,7 +1269,6 @@ td time {
 }
 .queue-panel {
   padding: 24px;
-  margin-bottom: 20px;
 }
 .queue-panel h2 {
   font-size: 17px;

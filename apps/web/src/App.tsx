@@ -558,13 +558,13 @@ function SystemsMap() {
               <path d="M0,0 L8,4 L0,8 Z" />
             </marker>
           </defs>
-          <path d="M185 147 H333" />
-          <path d="M492 135 H644" />
-          <path d="M492 207 H644" />
-          <path d="M770 163 H844" />
-          <path d="M770 236 H844" />
-          <path d="M708 286 V342 H474" />
-          <path d="M402 284 V342 H226 V234" />
+          <path d="M220 218 H350" />
+          <path d="M553 170 H678" />
+          <path d="M553 250 H678" />
+          <path d="M827 166 H895" />
+          <path d="M827 316 H895" />
+          <path d="M752 366 V430 H448" />
+          <path d="M445 368 V430 H130 V282" />
         </svg>
         <div className="systems-zone zone-client">
           <span>Usuário</span>
@@ -847,110 +847,112 @@ function Reliability({
     selectedId ? "/api/cases/" + selectedId + "/delivery" : null,
   );
   return (
-    <div className="reliability-grid">
-      <div className="architecture-column">
-        <SystemsMap />
-        <ArchitectureCanvas />
-        <section className="panel demo-guide">
-          <div className="panel-kicker">DEMONSTRAÇÃO GUIADA</div>
-          <h2>Veja a fila se recuperar.</h2>
-          <p className="quiet">
-            Pare o broker, crie uma solicitação e acompanhe a outbox publicar o
-            evento quando o RabbitMQ voltar.
-          </p>
-          <ol className="guide-list">
-            <li>
-              <span>01</span>
-              <div>
-                <h3>Interrompa o RabbitMQ</h3>
-                <p>No terminal do projeto:</p>
-                <code>docker compose stop rabbitmq</code>
-              </div>
-            </li>
-            <li>
-              <span>02</span>
-              <div>
-                <h3>Crie uma solicitação sintética</h3>
-                <p>A API persiste os dados e o evento na mesma transação.</p>
-                <button className="secondary" onClick={onNew}>
-                  Criar durante a demonstração
-                </button>
-              </div>
-            </li>
-            <li>
-              <span>03</span>
-              <div>
-                <h3>Restaure o broker</h3>
-                <code>docker compose start rabbitmq</code>
-                <p>Acompanhe a notificação surgir no painel de detalhes.</p>
-              </div>
-            </li>
-            <li>
-              <span>04</span>
-              <div>
-                <h3>Repita a entrega</h3>
-                <p>
-                  Use o eventId da solicitação selecionada. A quantidade de
-                  notificações deve permanecer em um.
-                </p>
-                <code className="wrap-code">
-                  {event.data?.data[0]
-                    ? "docker compose exec publisher node dist/src/replay.js " +
-                      event.data.data[0].eventId
-                    : "Selecione uma solicitação para obter o eventId."}
-                </code>
-              </div>
-            </li>
-          </ol>
-        </section>
-      </div>
-      <div>
-        <section className="panel queue-panel">
-          <div className="panel-kicker">LEITURA DO BROKER</div>
-          <h2>Filas, sem efeitos externos.</h2>
-          <dl>
-            <div>
-              <dt>Prontas para consumo</dt>
-              <dd>{operations?.broker.ready ?? "—"}</dd>
-            </div>
-            <div>
-              <dt>Aguardando retry</dt>
-              <dd>{operations?.broker.retryReady ?? "—"}</dd>
-            </div>
-            <div>
-              <dt>Dead-letter queue</dt>
-              <dd>{operations?.broker.deadLetters ?? "—"}</dd>
-            </div>
-          </dl>
-          <p className="quiet">
-            Contagens instantâneas de mensagens prontas. Entregas em
-            processamento não estão incluídas.
-          </p>
-          <div className="delivery-contract">
-            <strong>At least once</strong>
-            <p>
-              Uma mensagem pode chegar novamente. O consumidor idempotente
-              protege a gravação da notificação.
+    <div className="architecture-layout">
+      <SystemsMap />
+      <div className="reliability-grid">
+        <div className="architecture-column">
+          <ArchitectureCanvas />
+          <section className="panel demo-guide">
+            <div className="panel-kicker">DEMONSTRAÇÃO GUIADA</div>
+            <h2>Veja a fila se recuperar.</h2>
+            <p className="quiet">
+              Pare o broker, crie uma solicitação e acompanhe a outbox publicar
+              o evento quando o RabbitMQ voltar.
             </p>
-          </div>
-        </section>
-        {selectedId ? (
-          <CaseDetails
-            key={selectedId}
-            id={selectedId}
-            onChange={() => {}}
-            showDelivery
-          />
-        ) : (
-          <section className="panel selection-empty">
-            <span className="empty-icon">↗</span>
-            <h2>Selecione uma solicitação</h2>
-            <p>
-              Na aba Solicitações, escolha um item para acompanhar a entrega
-              técnica durante a demonstração.
-            </p>
+            <ol className="guide-list">
+              <li>
+                <span>01</span>
+                <div>
+                  <h3>Interrompa o RabbitMQ</h3>
+                  <p>No terminal do projeto:</p>
+                  <code>docker compose stop rabbitmq</code>
+                </div>
+              </li>
+              <li>
+                <span>02</span>
+                <div>
+                  <h3>Crie uma solicitação sintética</h3>
+                  <p>A API persiste os dados e o evento na mesma transação.</p>
+                  <button className="secondary" onClick={onNew}>
+                    Criar durante a demonstração
+                  </button>
+                </div>
+              </li>
+              <li>
+                <span>03</span>
+                <div>
+                  <h3>Restaure o broker</h3>
+                  <code>docker compose start rabbitmq</code>
+                  <p>Acompanhe a notificação surgir no painel de detalhes.</p>
+                </div>
+              </li>
+              <li>
+                <span>04</span>
+                <div>
+                  <h3>Repita a entrega</h3>
+                  <p>
+                    Use o eventId da solicitação selecionada. A quantidade de
+                    notificações deve permanecer em um.
+                  </p>
+                  <code className="wrap-code">
+                    {event.data?.data[0]
+                      ? "docker compose exec publisher node dist/src/replay.js " +
+                        event.data.data[0].eventId
+                      : "Selecione uma solicitação para obter o eventId."}
+                  </code>
+                </div>
+              </li>
+            </ol>
           </section>
-        )}
+        </div>
+        <div className="architecture-side">
+          <section className="panel queue-panel">
+            <div className="panel-kicker">LEITURA DO BROKER</div>
+            <h2>Filas, sem efeitos externos.</h2>
+            <dl>
+              <div>
+                <dt>Prontas para consumo</dt>
+                <dd>{operations?.broker.ready ?? "—"}</dd>
+              </div>
+              <div>
+                <dt>Aguardando retry</dt>
+                <dd>{operations?.broker.retryReady ?? "—"}</dd>
+              </div>
+              <div>
+                <dt>Dead-letter queue</dt>
+                <dd>{operations?.broker.deadLetters ?? "—"}</dd>
+              </div>
+            </dl>
+            <p className="quiet">
+              Contagens instantâneas de mensagens prontas. Entregas em
+              processamento não estão incluídas.
+            </p>
+            <div className="delivery-contract">
+              <strong>At least once</strong>
+              <p>
+                Uma mensagem pode chegar novamente. O consumidor idempotente
+                protege a gravação da notificação.
+              </p>
+            </div>
+          </section>
+          {selectedId ? (
+            <CaseDetails
+              key={selectedId}
+              id={selectedId}
+              onChange={() => {}}
+              showDelivery
+            />
+          ) : (
+            <section className="panel selection-empty">
+              <span className="empty-icon">↗</span>
+              <h2>Selecione uma solicitação</h2>
+              <p>
+                Na aba Solicitações, escolha um item para acompanhar a entrega
+                técnica durante a demonstração.
+              </p>
+            </section>
+          )}
+        </div>
       </div>
     </div>
   );
