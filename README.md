@@ -8,8 +8,40 @@ The demo has two faces:
 
 - A case queue for the fictional support flow: **OPEN → TRIAGE → ASSIGNED → RESOLVED**.
 - An architecture and observability console that makes the outbox, broker recovery, retries, dead-letter queue and duplicate-event protection visible.
+- A glossary for readers who are learning backend concepts from zero.
 
 All examples are fictional. Do not enter personal or patient data. Skipping, reversing, and repeating a status returns HTTP 409. Only creation emits an event; status changes remain synchronous.
+
+## Beginner glossary
+
+These terms appear in the project and in the demo UI:
+
+| Term                    | Plain meaning                                                  | In CareQueue                                                      |
+| ----------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------- |
+| API                     | A server entry point that other programs call.                 | Receives requests to create cases, list cases and change status.  |
+| Backend                 | The server-side part that owns rules, data and integrations.   | Express, PostgreSQL, RabbitMQ, publisher and worker.              |
+| Frontend                | The browser screen used by a person.                           | The React console at http://localhost:8080.                       |
+| PostgreSQL              | A relational database.                                         | Stores cases, history, outbox events and simulated notifications. |
+| RabbitMQ                | A message broker.                                              | Delivers CaseCreated.v1 from the publisher to the worker.         |
+| Broker                  | A service that receives and delivers messages.                 | RabbitMQ is the broker in this project.                           |
+| Queue                   | A line of messages waiting to be processed.                    | The worker consumes case-created messages from a queue.           |
+| Event                   | A record that something happened.                              | CaseCreated.v1 means a case was created.                          |
+| Outbox                  | A database table for events waiting to be published.           | Keeps the event safe if RabbitMQ is temporarily down.             |
+| Publisher               | A process that sends messages to a broker.                     | Reads pending outbox rows and publishes them to RabbitMQ.         |
+| Publisher confirm       | A broker acknowledgement that it accepted a message.           | The event is marked published only after this confirmation.       |
+| Worker                  | A background process.                                          | Consumes the event and writes a simulated notification.           |
+| Idempotency             | Repeating an action without duplicating the final effect.      | The same eventId cannot create two notifications.                 |
+| At least once           | A delivery style where a message may arrive one or more times. | The worker is safe because it is idempotent.                      |
+| Exactly once            | A hard guarantee that something happens exactly one time.      | This project does not claim exactly once.                         |
+| Retry                   | Trying again after a temporary failure.                        | Failed worker handling can be retried a limited number of times.  |
+| Dead-letter queue / DLQ | A queue for messages that failed repeatedly.                   | Persistent failures end there for inspection.                     |
+| correlationId           | An ID used to follow one request across logs and processes.    | Connects the HTTP request, event and worker logs.                 |
+| eventId                 | The unique ID of an event.                                     | Used as the idempotency key for notification creation.            |
+| Transaction             | A group of database changes that succeeds or fails together.   | Case, initial history and outbox event are inserted together.     |
+| Docker Compose          | A tool for running several local services together.            | Starts API, frontend, PostgreSQL, RabbitMQ, publisher and worker. |
+| CI                      | Automated checks run by the repository.                        | GitHub Actions runs lint, typecheck and tests.                    |
+| PR                      | Pull request: a proposed change before merging into main.      | The project evolution was shown through PRs.                      |
+| main                    | The stable branch of the repository.                           | Protected by PR and required checks.                              |
 
 ## Stack and architecture
 

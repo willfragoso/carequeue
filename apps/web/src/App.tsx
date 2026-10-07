@@ -288,6 +288,360 @@ function DeliveryFlow({ event }: { event: Delivery | undefined }) {
     </div>
   );
 }
+const architectureSteps = [
+  {
+    number: "01",
+    title: "API recebe a solicitação",
+    label: "Express API",
+    detail: "Valida a entrada HTTP, gera o correlationId e inicia a transação.",
+  },
+  {
+    number: "02",
+    title: "PostgreSQL confirma o registro",
+    label: "Cases + History + Outbox",
+    detail:
+      "Grava a solicitação, o histórico inicial e o evento CaseCreated.v1 juntos.",
+  },
+  {
+    number: "03",
+    title: "Publisher entrega ao broker",
+    label: "Outbox relay",
+    detail:
+      "Lê eventos pendentes e só marca como publicado após publisher confirm.",
+  },
+  {
+    number: "04",
+    title: "RabbitMQ desacopla o trabalho",
+    label: "RabbitMQ",
+    detail:
+      "Mantém a mensagem durável e aplica retentativas limitadas antes da DLQ.",
+  },
+  {
+    number: "05",
+    title: "Worker salva o efeito",
+    label: "Worker",
+    detail:
+      "Consome at least once, grava a notificação por eventId e só então confirma.",
+  },
+  {
+    number: "06",
+    title: "Observabilidade fecha o ciclo",
+    label: "Delivery view",
+    detail:
+      "Mostra eventId, correlationId, status de entrega, retry e dead-letter queue.",
+  },
+];
+const glossaryTerms = [
+  {
+    term: "API",
+    plain:
+      "Uma porta de entrada para outros programas pedirem algo ao sistema.",
+    context:
+      "No CareQueue, a API recebe comandos como criar uma solicitação ou mudar seu status.",
+  },
+  {
+    term: "Backend",
+    plain:
+      "A parte do sistema que roda no servidor e cuida das regras, dados e integrações.",
+    context:
+      "Este projeto mostra o backend por trás de uma fila fictícia de atendimento.",
+  },
+  {
+    term: "Frontend",
+    plain: "A tela que a pessoa usa no navegador para interagir com o sistema.",
+    context:
+      "Aqui ele serve para criar solicitações, ver a arquitetura e testar falhas.",
+  },
+  {
+    term: "PostgreSQL",
+    plain: "Um banco de dados relacional usado para guardar informações.",
+    context:
+      "Ele guarda solicitações, histórico, eventos pendentes e notificações simuladas.",
+  },
+  {
+    term: "RabbitMQ",
+    plain:
+      "Um sistema de filas que entrega mensagens entre partes diferentes da aplicação.",
+    context:
+      "Ele leva o evento CaseCreated.v1 até o worker, sem bloquear a criação da solicitação.",
+  },
+  {
+    term: "Broker",
+    plain: "Outro nome para o sistema que recebe, guarda e entrega mensagens.",
+    context:
+      "Neste projeto, o broker é o RabbitMQ. Se ele cair, a API ainda salva a solicitação.",
+  },
+  {
+    term: "Fila",
+    plain:
+      "Uma linha de mensagens aguardando processamento, parecida com uma fila de atendimento.",
+    context:
+      "O worker consome mensagens da fila para criar notificações simuladas.",
+  },
+  {
+    term: "Mensagem",
+    plain:
+      "Um pacote pequeno de informação enviado de uma parte do sistema para outra.",
+    context: "O evento CaseCreated.v1 vira uma mensagem publicada no RabbitMQ.",
+  },
+  {
+    term: "Evento",
+    plain: "Um registro dizendo que algo importante aconteceu no sistema.",
+    context:
+      "Quando uma solicitação é criada, o sistema registra o evento CaseCreated.v1.",
+  },
+  {
+    term: "Outbox",
+    plain:
+      "Uma tabela no banco que guarda eventos que ainda precisam ser publicados.",
+    context:
+      "Ela evita perder o evento quando a solicitação foi salva, mas o RabbitMQ está fora.",
+  },
+  {
+    term: "Publisher",
+    plain:
+      "O processo responsável por publicar mensagens em uma fila ou broker.",
+    context: "Ele lê a outbox e envia os eventos pendentes para o RabbitMQ.",
+  },
+  {
+    term: "Publisher confirm",
+    plain:
+      "Uma confirmação do broker dizendo que recebeu a mensagem publicada.",
+    context: "O evento só é marcado como publicado depois dessa confirmação.",
+  },
+  {
+    term: "Worker",
+    plain:
+      "Um processo que trabalha em segundo plano, sem depender de uma tela aberta.",
+    context:
+      "Ele consome o evento e grava uma notificação simulada no PostgreSQL.",
+  },
+  {
+    term: "Idempotência",
+    plain: "A propriedade de repetir uma ação sem duplicar o resultado final.",
+    context:
+      "Se o mesmo evento chegar duas vezes, o worker não cria duas notificações.",
+  },
+  {
+    term: "At least once",
+    plain: "Uma garantia de entrega em que a mensagem chega uma ou mais vezes.",
+    context:
+      "O sistema aceita repetição de mensagem e se protege com idempotência.",
+  },
+  {
+    term: "Exactly once",
+    plain:
+      "A promessa de que algo acontece exatamente uma vez. É difícil garantir em sistemas distribuídos.",
+    context:
+      "O CareQueue não promete exactly once; ele usa at least once com consumidor idempotente.",
+  },
+  {
+    term: "Retry",
+    plain: "Uma nova tentativa automática depois de uma falha temporária.",
+    context:
+      "Se o worker falhar, a mensagem pode tentar novamente algumas vezes.",
+  },
+  {
+    term: "Dead-letter queue",
+    plain:
+      "Uma fila para mensagens que falharam várias vezes e precisam de investigação.",
+    context:
+      "Depois do limite de retries, a mensagem vai para a DLQ em vez de ficar em ciclo infinito.",
+  },
+  {
+    term: "DLQ",
+    plain: "Abreviação de dead-letter queue.",
+    context:
+      "Na tela de Arquitetura, ela mostra mensagens que não conseguiram ser processadas.",
+  },
+  {
+    term: "correlationId",
+    plain:
+      "Um identificador usado para seguir a mesma solicitação em logs e processos diferentes.",
+    context:
+      "Ele ajuda a ligar a chamada HTTP, o evento publicado e o processamento no worker.",
+  },
+  {
+    term: "eventId",
+    plain: "Um identificador único de um evento.",
+    context:
+      "Ele é usado como chave para impedir que uma entrega repetida duplique a notificação.",
+  },
+  {
+    term: "Transação",
+    plain: "Um grupo de mudanças no banco que entra inteiro ou não entra nada.",
+    context:
+      "A solicitação, o histórico inicial e o evento da outbox são gravados juntos.",
+  },
+  {
+    term: "Docker Compose",
+    plain:
+      "Uma forma de subir vários serviços locais com um único arquivo de configuração.",
+    context:
+      "Ele inicia API, frontend, PostgreSQL, RabbitMQ, publisher e worker para a demo.",
+  },
+  {
+    term: "CI",
+    plain:
+      "Um robô que roda testes e verificações automaticamente quando há mudança no código.",
+    context:
+      "O GitHub Actions executa lint, typecheck, testes, integração e E2E.",
+  },
+  {
+    term: "PR",
+    plain:
+      "Pull request: uma proposta de mudança no código para revisão antes de entrar na branch principal.",
+    context:
+      "O projeto foi evoluído em PRs para mostrar histórico real de desenvolvimento.",
+  },
+  {
+    term: "Branch",
+    plain: "Uma linha separada de trabalho no Git.",
+    context:
+      "Mudanças novas são feitas em branches e depois entram na main por PR.",
+  },
+  {
+    term: "main",
+    plain:
+      "A branch principal do repositório, onde fica a versão estável do projeto.",
+    context:
+      "Ela está protegida para exigir PR e checks antes de aceitar mudanças.",
+  },
+];
+function ArchitectureCanvas() {
+  return (
+    <section className="panel architecture-panel">
+      <div className="panel-kicker">DIAGRAMA DO FLUXO</div>
+      <h2>Como uma solicitação vira uma notificação confiável.</h2>
+      <div className="architecture-canvas" aria-label="Arquitetura CareQueue">
+        {architectureSteps.map((step, index) => (
+          <article key={step.number} className="architecture-node">
+            <span className="architecture-number">{step.number}</span>
+            <strong>{step.label}</strong>
+            <small>{step.title}</small>
+            <p>{step.detail}</p>
+            {index < architectureSteps.length - 1 && (
+              <span className="architecture-arrow" aria-hidden="true">
+                →
+              </span>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+function SystemsMap() {
+  return (
+    <section className="panel systems-map-panel">
+      <div className="panel-kicker">MAPA DOS SISTEMAS</div>
+      <h2>Componentes que executam a demonstração.</h2>
+      <div
+        className="systems-board"
+        aria-label="Diagrama dos sistemas CareQueue"
+      >
+        <svg
+          className="systems-lines"
+          viewBox="0 0 1000 430"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <marker
+              id="arrowhead"
+              markerHeight="8"
+              markerWidth="8"
+              orient="auto"
+              refX="7"
+              refY="4"
+            >
+              <path d="M0,0 L8,4 L0,8 Z" />
+            </marker>
+          </defs>
+          <path d="M220 218 H350" />
+          <path d="M553 170 H678" />
+          <path d="M553 250 H678" />
+          <path d="M827 166 H895" />
+          <path d="M827 316 H895" />
+          <path d="M752 366 V430 H448" />
+          <path d="M445 368 V430 H130 V282" />
+        </svg>
+        <div className="systems-zone zone-client">
+          <span>Usuário</span>
+          <article className="system-card accent-teal">
+            <b>React console</b>
+            <small>Solicitações, arquitetura e glossário no navegador.</small>
+          </article>
+        </div>
+        <div className="systems-zone zone-api">
+          <span>Aplicação Node.js</span>
+          <article className="system-card accent-blue">
+            <b>Express API</b>
+            <small>Validação HTTP, regras de status e correlationId.</small>
+          </article>
+          <article className="system-card accent-purple">
+            <b>Outbox publisher</b>
+            <small>Lê eventos pendentes e publica com confirmação.</small>
+          </article>
+          <article className="system-card accent-orange">
+            <b>Worker</b>
+            <small>Consome eventos e salva a notificação simulada.</small>
+          </article>
+        </div>
+        <div className="systems-zone zone-data">
+          <span>Persistência</span>
+          <article className="system-card accent-green">
+            <b>PostgreSQL</b>
+            <small>Cases, histórico, outbox e notificações.</small>
+          </article>
+        </div>
+        <div className="systems-zone zone-broker">
+          <span>Mensageria</span>
+          <article className="system-card accent-amber">
+            <b>RabbitMQ</b>
+            <small>Fila principal, retries limitados e DLQ.</small>
+          </article>
+        </div>
+        <ol className="systems-legend" aria-label="Legenda do mapa">
+          <li>
+            <span>1</span> Console chama a API.
+          </li>
+          <li>
+            <span>2</span> API grava dados e evento na mesma transação.
+          </li>
+          <li>
+            <span>3</span> Publisher envia o evento para o broker.
+          </li>
+          <li>
+            <span>4</span> Worker processa com idempotência.
+          </li>
+        </ol>
+      </div>
+    </section>
+  );
+}
+function Glossary() {
+  return (
+    <section className="panel glossary-panel">
+      <div className="panel-kicker">GLOSSÁRIO PARA COMEÇAR</div>
+      <h2>Termos técnicos em linguagem simples.</h2>
+      <p>
+        Use esta tela como cola rápida enquanto explora Solicitações e
+        Arquitetura. As explicações focam no papel de cada termo dentro do
+        CareQueue.
+      </p>
+      <div className="glossary-grid">
+        {glossaryTerms.map((item) => (
+          <article key={item.term} className="glossary-card">
+            <h3>{item.term}</h3>
+            <p>{item.plain}</p>
+            <small>{item.context}</small>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
 function CaseDetails({
   id,
   onChange,
@@ -493,112 +847,120 @@ function Reliability({
     selectedId ? "/api/cases/" + selectedId + "/delivery" : null,
   );
   return (
-    <div className="reliability-grid">
-      <section className="panel demo-guide">
-        <div className="panel-kicker">ARQUITETURA & OBSERVABILIDADE</div>
-        <h2>Veja a fila se recuperar.</h2>
-        <p className="quiet">
-          Esta tela mostra a parte técnica: outbox, RabbitMQ, retentativas,
-          dead-letter queue e idempotência do consumidor.
-        </p>
-        <ol className="guide-list">
-          <li>
-            <span>01</span>
-            <div>
-              <h3>Interrompa o RabbitMQ</h3>
-              <p>No terminal do projeto:</p>
-              <code>docker compose stop rabbitmq</code>
-            </div>
-          </li>
-          <li>
-            <span>02</span>
-            <div>
-              <h3>Crie uma solicitação sintética</h3>
-              <p>A API persiste os dados e o evento na mesma transação.</p>
-              <button className="secondary" onClick={onNew}>
-                Criar durante a demonstração
-              </button>
-            </div>
-          </li>
-          <li>
-            <span>03</span>
-            <div>
-              <h3>Restaure o broker</h3>
-              <code>docker compose start rabbitmq</code>
-              <p>Acompanhe a notificação surgir no painel de detalhes.</p>
-            </div>
-          </li>
-          <li>
-            <span>04</span>
-            <div>
-              <h3>Repita a entrega</h3>
-              <p>
-                Use o eventId da solicitação selecionada. A quantidade de
-                notificações deve permanecer em um.
-              </p>
-              <code className="wrap-code">
-                {event.data?.data[0]
-                  ? "docker compose exec publisher node dist/src/replay.js " +
-                    event.data.data[0].eventId
-                  : "Selecione uma solicitação para obter o eventId."}
-              </code>
-            </div>
-          </li>
-        </ol>
-      </section>
-      <div>
-        <section className="panel queue-panel">
-          <div className="panel-kicker">LEITURA DO BROKER</div>
-          <h2>Filas, sem efeitos externos.</h2>
-          <dl>
-            <div>
-              <dt>Prontas para consumo</dt>
-              <dd>{operations?.broker.ready ?? "—"}</dd>
-            </div>
-            <div>
-              <dt>Aguardando retry</dt>
-              <dd>{operations?.broker.retryReady ?? "—"}</dd>
-            </div>
-            <div>
-              <dt>Dead-letter queue</dt>
-              <dd>{operations?.broker.deadLetters ?? "—"}</dd>
-            </div>
-          </dl>
-          <p className="quiet">
-            Contagens instantâneas de mensagens prontas. Entregas em
-            processamento não estão incluídas.
-          </p>
-          <div className="delivery-contract">
-            <strong>At least once</strong>
-            <p>
-              Uma mensagem pode chegar novamente. O consumidor idempotente
-              protege a gravação da notificação.
+    <div className="architecture-layout">
+      <SystemsMap />
+      <div className="reliability-grid">
+        <div className="architecture-column">
+          <ArchitectureCanvas />
+          <section className="panel demo-guide">
+            <div className="panel-kicker">DEMONSTRAÇÃO GUIADA</div>
+            <h2>Veja a fila se recuperar.</h2>
+            <p className="quiet">
+              Pare o broker, crie uma solicitação e acompanhe a outbox publicar
+              o evento quando o RabbitMQ voltar.
             </p>
-          </div>
-        </section>
-        {selectedId ? (
-          <CaseDetails
-            key={selectedId}
-            id={selectedId}
-            onChange={() => {}}
-            showDelivery
-          />
-        ) : (
-          <section className="panel selection-empty">
-            <span className="empty-icon">↗</span>
-            <h2>Selecione uma solicitação</h2>
-            <p>
-              Na aba Solicitações, escolha um item para acompanhar a entrega
-              técnica durante a demonstração.
-            </p>
+            <ol className="guide-list">
+              <li>
+                <span>01</span>
+                <div>
+                  <h3>Interrompa o RabbitMQ</h3>
+                  <p>No terminal do projeto:</p>
+                  <code>docker compose stop rabbitmq</code>
+                </div>
+              </li>
+              <li>
+                <span>02</span>
+                <div>
+                  <h3>Crie uma solicitação sintética</h3>
+                  <p>A API persiste os dados e o evento na mesma transação.</p>
+                  <button className="secondary" onClick={onNew}>
+                    Criar durante a demonstração
+                  </button>
+                </div>
+              </li>
+              <li>
+                <span>03</span>
+                <div>
+                  <h3>Restaure o broker</h3>
+                  <code>docker compose start rabbitmq</code>
+                  <p>Acompanhe a notificação surgir no painel de detalhes.</p>
+                </div>
+              </li>
+              <li>
+                <span>04</span>
+                <div>
+                  <h3>Repita a entrega</h3>
+                  <p>
+                    Use o eventId da solicitação selecionada. A quantidade de
+                    notificações deve permanecer em um.
+                  </p>
+                  <code className="wrap-code">
+                    {event.data?.data[0]
+                      ? "docker compose exec publisher node dist/src/replay.js " +
+                        event.data.data[0].eventId
+                      : "Selecione uma solicitação para obter o eventId."}
+                  </code>
+                </div>
+              </li>
+            </ol>
           </section>
-        )}
+        </div>
+        <div className="architecture-side">
+          <section className="panel queue-panel">
+            <div className="panel-kicker">LEITURA DO BROKER</div>
+            <h2>Filas, sem efeitos externos.</h2>
+            <dl>
+              <div>
+                <dt>Prontas para consumo</dt>
+                <dd>{operations?.broker.ready ?? "—"}</dd>
+              </div>
+              <div>
+                <dt>Aguardando retry</dt>
+                <dd>{operations?.broker.retryReady ?? "—"}</dd>
+              </div>
+              <div>
+                <dt>Dead-letter queue</dt>
+                <dd>{operations?.broker.deadLetters ?? "—"}</dd>
+              </div>
+            </dl>
+            <p className="quiet">
+              Contagens instantâneas de mensagens prontas. Entregas em
+              processamento não estão incluídas.
+            </p>
+            <div className="delivery-contract">
+              <strong>At least once</strong>
+              <p>
+                Uma mensagem pode chegar novamente. O consumidor idempotente
+                protege a gravação da notificação.
+              </p>
+            </div>
+          </section>
+          {selectedId ? (
+            <CaseDetails
+              key={selectedId}
+              id={selectedId}
+              onChange={() => {}}
+              showDelivery
+            />
+          ) : (
+            <section className="panel selection-empty">
+              <span className="empty-icon">↗</span>
+              <h2>Selecione uma solicitação</h2>
+              <p>
+                Na aba Solicitações, escolha um item para acompanhar a entrega
+                técnica durante a demonstração.
+              </p>
+            </section>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 export function App() {
-  const [view, setView] = useState<"cases" | "architecture">("cases");
+  const [view, setView] = useState<"cases" | "architecture" | "glossary">(
+    "cases",
+  );
   const [filter, setFilter] = useState("");
   const [cursor, setCursor] = useState<string | null>(null);
   const [previous, setPrevious] = useState<(string | null)[]>([]);
@@ -644,6 +1006,12 @@ export function App() {
           >
             <span aria-hidden="true">⇄</span>Arquitetura
           </button>
+          <button
+            className={view === "glossary" ? "active" : ""}
+            onClick={() => setView("glossary")}
+          >
+            <span aria-hidden="true">?</span>Glossário
+          </button>
         </nav>
         <div className="sidebar-note">
           <span>◈</span>
@@ -661,7 +1029,11 @@ export function App() {
         <header className="topbar">
           <span>
             Workspace <b>/</b>{" "}
-            {view === "cases" ? "Solicitações" : "Arquitetura"}
+            {view === "cases"
+              ? "Solicitações"
+              : view === "architecture"
+                ? "Arquitetura"
+                : "Glossário"}
           </span>
           <div className="topbar-status">
             <i className={productAvailable ? "dot green" : "dot amber"} />
@@ -676,12 +1048,16 @@ export function App() {
               <h1>
                 {view === "cases"
                   ? "Da entrada à resolução, sem perder o rastro."
-                  : "Quando o broker falha, a fila continua."}
+                  : view === "architecture"
+                    ? "Quando o broker falha, a fila continua."
+                    : "Um mapa para aprender os termos do projeto."}
               </h1>
               <p>
                 {view === "cases"
                   ? "CareQueue registra solicitações fictícias, guia a triagem e mostra o histórico de cada mudança."
-                  : "Pare o RabbitMQ, crie uma solicitação e veja a outbox publicar o evento quando o broker voltar."}
+                  : view === "architecture"
+                    ? "Pare o RabbitMQ, crie uma solicitação e veja a outbox publicar o evento quando o broker voltar."
+                    : "Cada conceito aparece com uma explicação curta e o motivo de existir na demo."}
               </p>
             </div>
             <button
@@ -855,19 +1231,23 @@ export function App() {
                 </aside>
               )}
             </div>
-          ) : (
+          ) : view === "architecture" ? (
             <Reliability
               operations={snapshot}
               selectedId={selectedId}
               onNew={() => setShowNew(true)}
             />
+          ) : (
+            <Glossary />
           )}
           <footer className="page-footer">
             <span>CareQueue · demonstração com dados sintéticos</span>
             <span>
               {view === "cases"
                 ? "Produto fictício para triagem e acompanhamento."
-                : "Persistência primeiro. Entrega em segundo plano."}
+                : view === "architecture"
+                  ? "Persistência primeiro. Entrega em segundo plano."
+                  : "Aprendizado do zero, sem jargão desnecessário."}
             </span>
           </footer>
         </div>
