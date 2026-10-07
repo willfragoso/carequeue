@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import type { ConsumeMessage, GetMessage, ConfirmChannel } from "amqplib";
-import { pool } from "./db.js";
-import { eventSchema, type CaseEvent } from "./domain.js";
-import { config } from "./config.js";
-import { logger } from "./logger.js";
+import { pool } from "../platform/db.js";
+import { eventSchema, type CaseEvent } from "../cases/domain.js";
+import { config } from "../platform/config.js";
+import { logger } from "../platform/logger.js";
 import { publishConfirmed, queues } from "./broker.js";
 import { retryQueue, retryDelay } from "./retries.js";
 export async function saveNotification(event: CaseEvent) {

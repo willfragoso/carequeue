@@ -1,7 +1,7 @@
 import { setTimeout as delay } from "node:timers/promises";
-import { runBrokerProcess } from "./runtime.js";
-import { relayOne } from "./relay.js";
-import { publishConfirmed, queues } from "./broker.js";
+import { runBrokerProcess } from "../messaging/runtime.js";
+import { relayOne } from "../messaging/relay.js";
+import { publishConfirmed, queues } from "../messaging/broker.js";
 await runBrokerProcess("publisher", async ({ connection, channel }, signal) => {
   let closed = false;
   connection.on("close", () => {

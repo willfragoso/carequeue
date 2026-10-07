@@ -1,14 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { beforeAll, afterAll, it, expect } from "vitest";
 import request from "supertest";
-import { pool } from "../src/db.js";
-import { applyMigrations } from "../src/migrations.js";
-import { createCase, listCasesCursor } from "../src/cases.js";
-import { createApp } from "../src/app.js";
+import { pool } from "../../src/platform/db.js";
+import { applyMigrations } from "../../src/platform/migrations.js";
+import { createCase, listCasesCursor } from "../../src/cases/cases.js";
+import { createApp } from "../../src/http/app.js";
 beforeAll(async () => {
   if (process.env.ALLOW_DESTRUCTIVE_TESTS !== "true")
     throw new Error("Disposable database required");
-  await applyMigrations(pool, new URL("../migrations/", import.meta.url));
+  await applyMigrations(pool, new URL("../../migrations/", import.meta.url));
   await pool.query(
     "TRUNCATE notifications,outbox,case_history,cases RESTART IDENTITY CASCADE",
   );

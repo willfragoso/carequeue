@@ -5,8 +5,8 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import pg from "pg";
 import { it, expect } from "vitest";
-import { config } from "../src/config.js";
-import { applyMigrations } from "../src/migrations.js";
+import { config } from "../../src/platform/config.js";
+import { applyMigrations } from "../../src/platform/migrations.js";
 
 async function fixture(run: (pool: pg.Pool, directory: URL) => Promise<void>) {
   if (process.env.ALLOW_DESTRUCTIVE_TESTS !== "true")

@@ -3,9 +3,9 @@ import { describe, it, expect, vi } from "vitest";
 import request from "supertest";
 process.env.DATABASE_URL = "postgres://unused:unused@localhost/unused";
 process.env.RABBITMQ_URL = "amqp://localhost";
-const { canTransition, eventSchema } = await import("../src/domain.js");
-const { processEvent } = await import("../src/consumer.js");
-const { createApp } = await import("../src/app.js");
+const { canTransition, eventSchema } = await import("../../src/cases/domain.js");
+const { processEvent } = await import("../../src/messaging/consumer.js");
+const { createApp } = await import("../../src/http/app.js");
 const event = {
   eventId: randomUUID(),
   eventType: "CaseCreated.v1" as const,

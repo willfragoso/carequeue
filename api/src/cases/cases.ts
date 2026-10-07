@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
-import { pool, transaction } from "./db.js";
+import { pool, transaction } from "../platform/db.js";
 import {
   canTransition,
   statusSchema,

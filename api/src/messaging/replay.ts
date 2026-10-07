@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { pool } from "./db.js";
+import { pool } from "../platform/db.js";
 import { connectBroker, publishConfirmed, queues } from "./broker.js";
 const id = z.uuid().parse(process.argv[2]);
 const result = await pool.query(

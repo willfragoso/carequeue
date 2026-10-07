@@ -1,19 +1,19 @@
 import { randomUUID } from "node:crypto";
-import { applyMigrations } from "../src/migrations.js";
+import { applyMigrations } from "../../src/platform/migrations.js";
 import { setTimeout as delay } from "node:timers/promises";
 import { beforeAll, afterAll, beforeEach, describe, it, expect } from "vitest";
 import request from "supertest";
 import type { GetMessage } from "amqplib";
 // Dedicated disposable database and broker required. Never point at shared data.
-const { pool, transaction } = await import("../src/db.js");
-const { createCase, changeStatus } = await import("../src/cases.js");
-const { createApp } = await import("../src/app.js");
-const { relayOne } = await import("../src/relay.js");
-const { saveNotification, handleMessage } = await import("../src/consumer.js");
+const { pool, transaction } = await import("../../src/platform/db.js");
+const { createCase, changeStatus } = await import("../../src/cases/cases.js");
+const { createApp } = await import("../../src/http/app.js");
+const { relayOne } = await import("../../src/messaging/relay.js");
+const { saveNotification, handleMessage } = await import("../../src/messaging/consumer.js");
 const { connectBroker, publishConfirmed, queues } =
-  await import("../src/broker.js");
-const { retryQueues, retryDelay } = await import("../src/retries.js");
-const { config } = await import("../src/config.js");
+  await import("../../src/messaging/broker.js");
+const { retryQueues, retryDelay } = await import("../../src/messaging/retries.js");
+const { config } = await import("../../src/platform/config.js");
 let broker: Awaited<ReturnType<typeof connectBroker>>;
 async function next(queue: string): Promise<GetMessage> {
   for (let i = 0; i < 100; i++) {
@@ -28,7 +28,7 @@ beforeAll(async () => {
     throw new Error(
       "Set ALLOW_DESTRUCTIVE_TESTS=true only with disposable test services",
     );
-  await applyMigrations(pool, new URL("../migrations/", import.meta.url));
+  await applyMigrations(pool, new URL("../../migrations/", import.meta.url));
   broker = await connectBroker();
 }, 20000);
 beforeEach(async () => {

@@ -1,6 +1,6 @@
-import { runBrokerProcess } from "./runtime.js";
-import { queues } from "./broker.js";
-import { handleMessage } from "./consumer.js";
+import { runBrokerProcess } from "../messaging/runtime.js";
+import { queues } from "../messaging/broker.js";
+import { handleMessage } from "../messaging/consumer.js";
 
 await runBrokerProcess("worker", async ({ connection, channel }, signal) => {
   await channel.prefetch(1);

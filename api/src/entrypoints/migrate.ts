@@ -1,11 +1,11 @@
-import { pool } from "./db.js";
-import { applyMigrations } from "./migrations.js";
-import { logger } from "./logger.js";
+import { pool } from "../platform/db.js";
+import { applyMigrations } from "../platform/migrations.js";
+import { logger } from "../platform/logger.js";
 
 try {
   const applied = await applyMigrations(
     pool,
-    new URL("../../migrations/", import.meta.url),
+    new URL("../../../migrations/", import.meta.url),
   );
   logger.info({ step: "migrations_complete", applied });
 } catch {

@@ -1,6 +1,6 @@
 import { setTimeout as delay } from "node:timers/promises";
-import { pool } from "./db.js";
-import { logger } from "./logger.js";
+import { pool } from "../platform/db.js";
+import { logger } from "../platform/logger.js";
 import { connectBroker } from "./broker.js";
 export async function runBrokerProcess(
   role: string,

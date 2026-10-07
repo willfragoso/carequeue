@@ -1,4 +1,4 @@
-import { config } from "./config.js";
+import { config } from "../platform/config.js";
 export function retryDelay(attempt: number, base = config.RETRY_DELAY_MS) {
   return Math.min(base * 2 ** (attempt - 1), 60000);
 }
