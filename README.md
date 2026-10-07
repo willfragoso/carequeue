@@ -214,8 +214,8 @@ docker compose logs -f publisher worker
 Get the event UUID from the query above, then replay the same envelope:
 
 ```sh
-docker compose exec publisher node dist/src/replay.js EVENT_ID
-docker compose exec publisher node dist/src/replay.js EVENT_ID
+docker compose exec publisher node dist/src/entrypoints/replay.js EVENT_ID
+docker compose exec publisher node dist/src/entrypoints/replay.js EVENT_ID
 curl http://localhost:3000/api/cases/CASE_ID/notifications
 docker compose logs worker
 ```
