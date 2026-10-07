@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { pool } from "../platform/db.js";
-import { connectBroker, publishConfirmed, queues } from "../messaging/broker.js";
+import {
+  connectBroker,
+  publishConfirmed,
+  queues,
+} from "../messaging/broker.js";
 const id = z.uuid().parse(process.argv[2]);
 const result = await pool.query(
   "SELECT envelope FROM outbox WHERE event_id=$1",
