@@ -2,91 +2,85 @@
   <aside class="sidebar">
     <a class="brand" routerLink="/" aria-label="CareQueue início">
       <span class="brand-mark">C<span></span></span>
-      <div>CareQueue<small>FILA DE ATENDIMENTO</small></div>
+      <div>CareQueue<small>Fila de atendimento</small></div>
     </a>
-    <div class="workspace-tag">
-      <span class="dot green"></span>
-      Ambiente local
-    </div>
     <nav aria-label="Navegação principal">
-      <span class="nav-label">WORKSPACE</span>
       <button routerLink="/solicitacoes" routerLinkActive="active">
-        <span aria-hidden="true">▤</span>Solicitações
-        <span class="nav-count"
-          >{{ store.cases.data()?.data.length ?? "—" }}</span
-        >
+        <cq-icon name="inbox" />Solicitações
+        @if (store.summary.data()?.data; as summary) {
+          <span class="nav-count">{{ summary.total }}</span>
+        }
       </button>
       <button routerLink="/mapa" routerLinkActive="active">
-        <span aria-hidden="true">▧</span>Mapa
+        <cq-icon name="map" />Mapa
       </button>
       <button routerLink="/fluxo" routerLinkActive="active">
-        <span aria-hidden="true">⇄</span>Fluxo
+        <cq-icon name="workflow" />Fluxo
       </button>
       <button routerLink="/glossario" routerLinkActive="active">
-        <span aria-hidden="true">?</span>Glossário
+        <cq-icon name="book" />Glossário
       </button>
     </nav>
-    <div class="sidebar-note">
-      <span>◈</span>
-      <strong>Somente dados sintéticos</strong>
-      <p>
-        Uma fila fictícia para aceitar solicitações, acompanhar triagem e
-        demonstrar entrega confiável.
-      </p>
-    </div>
     <div class="sidebar-footer">
-      PRODUTO FICTÍCIO<span>Node.js · PostgreSQL · RabbitMQ</span>
+      <strong>Projeto de estudo</strong>
+      <span>Angular · Node.js · PostgreSQL · RabbitMQ</span>
+      <a
+        href="https://github.com/willfragoso/carequeue"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <cq-icon name="github" />Código no GitHub
+      </a>
     </div>
   </aside>
   <main>
-    <header class="topbar">
-      <span>Workspace <b>/</b> {{ meta().crumb }}</span>
-      <div class="topbar-status">
-        <i [class]="store.productAvailable() ? 'dot green' : 'dot amber'"></i>
-        {{ store.productAvailable() ? "API disponível" : "API sem leitura" }}
-        <span class="demo-badge">DEMO</span>
-      </div>
-    </header>
     <div class="main-content">
-      <section class="page-heading">
+      <header class="page-heading">
         <div>
-          <span class="eyebrow">TRIAGEM &amp; ACOMPANHAMENTO</span>
           <h1>{{ meta().heading }}</h1>
           <p>{{ meta().summary }}</p>
         </div>
         <button class="primary new-button" (click)="store.showNew.set(true)">
-          <span aria-hidden="true">＋</span>Nova solicitação
+          <cq-icon name="plus" />Nova solicitação
         </button>
-      </section>
+      </header>
+      @if (!store.productAvailable()) {
+        <div class="api-down" role="status">
+          <strong>API sem resposta.</strong> Os dados abaixo podem estar
+          desatualizados; a tela tenta reconectar sozinha.
+        </div>
+      }
       @if (store.view() === "flow") {
-      <cq-metrics
-        [data]="store.snapshot()"
-        [error]="store.operations.error()"
-      />
-      <cq-error-notice [error]="store.operations.error()" />
-      } @if (store.notice(); as notice) {
-      <div class="success-notice" role="status">
-        {{ notice }}
-        <button
-          class="icon-button"
-          aria-label="Dispensar mensagem"
-          (click)="store.notice.set('')"
-        >
-          ×
-        </button>
-      </div>
+        <cq-metrics
+          [data]="store.snapshot()"
+          [error]="store.operations.error()"
+        />
+        <cq-error-notice [error]="store.operations.error()" />
+      }
+      @if (store.notice(); as notice) {
+        <div class="success-notice" role="status">
+          <cq-icon name="check" />
+          <span>{{ notice }}</span>
+          <button
+            class="icon-button"
+            aria-label="Dispensar mensagem"
+            (click)="store.notice.set('')"
+          >
+            <cq-icon name="x" />
+          </button>
+        </div>
       }
       <router-outlet />
       <footer class="page-footer">
-        <span>CareQueue · demonstração com dados sintéticos</span>
+        <span>CareQueue · projeto de estudo</span>
         <span>{{ meta().footer }}</span>
       </footer>
     </div>
   </main>
   @if (store.showNew()) {
-  <cq-new-case-dialog
-    (closed)="store.showNew.set(false)"
-    (created)="store.caseCreated($event)"
-  />
+    <cq-new-case-dialog
+      (closed)="store.showNew.set(false)"
+      (created)="store.caseCreated($event)"
+    />
   }
 </div>

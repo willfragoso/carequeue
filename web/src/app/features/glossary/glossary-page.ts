@@ -9,9 +9,8 @@ import { glossaryTerms } from "./glossary-terms";
       <div class="panel-kicker">GLOSSÁRIO PARA COMEÇAR</div>
       <h2>Termos técnicos em linguagem simples.</h2>
       <p>
-        Use esta tela como cola rápida enquanto explora Solicitações e
-        Arquitetura. As explicações focam no papel de cada termo dentro do
-        CareQueue.
+        Use esta tela como cola rápida enquanto explora Solicitações, Mapa e
+        Fluxo. As explicações focam no papel de cada termo dentro do CareQueue.
       </p>
       <div class="glossary-grid">
         @for (item of terms; track item.term) {

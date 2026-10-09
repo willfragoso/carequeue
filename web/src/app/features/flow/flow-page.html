@@ -21,7 +21,7 @@
           <li>
             <span>02</span>
             <div>
-              <h3>Crie uma solicitação sintética</h3>
+              <h3>Crie uma solicitação</h3>
               <p>A API persiste os dados e o evento na mesma transação.</p>
               <button class="secondary" (click)="store.showNew.set(true)">
                 Criar durante a demonstração
@@ -44,12 +44,14 @@
                 Use o eventId da solicitação selecionada. A quantidade de
                 notificações deve permanecer em um.
               </p>
-              <code class="wrap-code"
-                >{{ delivery.data()?.data[0] ? "docker compose exec publisher
+              <code class="wrap-code">{{
+                delivery.data()?.data[0]
+                  ? "docker compose exec publisher
                 node dist/src/entrypoints/replay.js " +
-                delivery.data()!.data[0].eventId : "Selecione uma solicitação
-                para obter o eventId." }}</code
-              >
+                    delivery.data()!.data[0].eventId
+                  : "Selecione uma solicitação
+                para obter o eventId."
+              }}</code>
             </div>
           </li>
         </ol>
@@ -86,16 +88,16 @@
         </div>
       </section>
       @if (store.selectedId(); as id) {
-      <cq-case-details [id]="id" [showDelivery]="true" />
+        <cq-case-details [id]="id" [showDelivery]="true" />
       } @else {
-      <section class="panel selection-empty">
-        <span class="empty-icon">↗</span>
-        <h2>Selecione uma solicitação</h2>
-        <p>
-          Na aba Solicitações, escolha um item para acompanhar a entrega técnica
-          durante a demonstração.
-        </p>
-      </section>
+        <section class="panel selection-empty">
+          <span class="empty-icon"><cq-icon name="arrow-up-right" /></span>
+          <h2>Selecione uma solicitação</h2>
+          <p>
+            Na aba Solicitações, escolha um item para acompanhar a entrega
+            técnica durante a demonstração.
+          </p>
+        </section>
       }
     </div>
   </div>

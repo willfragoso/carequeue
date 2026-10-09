@@ -1,7 +1,6 @@
 export type ViewId = "cases" | "systems" | "flow" | "glossary";
 
 export interface ViewMeta {
-  crumb: string;
   heading: string;
   summary: string;
   footer: string;
@@ -9,31 +8,27 @@ export interface ViewMeta {
 
 export const views: Record<ViewId, ViewMeta> = {
   cases: {
-    crumb: "Solicitações",
-    heading: "Da entrada à resolução, sem perder o rastro.",
+    heading: "Solicitações",
     summary:
-      "CareQueue registra solicitações fictícias, guia a triagem e mostra o histórico de cada mudança.",
-    footer: "Produto fictício para triagem e acompanhamento.",
+      "Acompanhe cada solicitação da entrada à resolução, com o histórico de todas as mudanças.",
+    footer: "Fila de atendimento com triagem e histórico.",
   },
   systems: {
-    crumb: "Mapa dos sistemas",
-    heading: "Os componentes do CareQueue em um mapa.",
+    heading: "Mapa dos sistemas",
     summary:
-      "Veja navegador, API, banco, mensageria e worker como blocos separados.",
+      "Navegador, API, banco, mensageria e worker: o que cada parte faz e como elas se conectam.",
     footer: "Mapa visual dos componentes do sistema.",
   },
   flow: {
-    crumb: "Fluxo",
-    heading: "Quando o broker falha, a fila continua.",
+    heading: "Fluxo de entrega",
     summary:
-      "Pare o RabbitMQ, crie uma solicitação e veja a outbox publicar o evento quando o broker voltar.",
+      "Quando o broker falha, a fila continua: pare o RabbitMQ, crie uma solicitação e veja a outbox publicar o evento na volta.",
     footer: "Persistência primeiro. Entrega em segundo plano.",
   },
   glossary: {
-    crumb: "Glossário",
-    heading: "Um mapa para aprender os termos do projeto.",
+    heading: "Glossário",
     summary:
-      "Cada conceito aparece com uma explicação curta e o motivo de existir na demo.",
+      "Os termos técnicos do projeto em linguagem simples, com o papel de cada um aqui.",
     footer: "Aprendizado do zero, sem jargão desnecessário.",
   },
 };

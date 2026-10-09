@@ -141,6 +141,12 @@ it("matches the spec for offset and cursor listings", async () => {
   );
   expectContract(cursor, "get", "/api/cases");
   expect(cursor.body.pagination.mode).toBe("cursor");
+  const summary = await request(app).get("/api/cases/summary");
+  expectContract(summary, "get", "/api/cases/summary");
+  expect(summary.body.data).toEqual({
+    total: 1,
+    byStatus: { OPEN: 1, TRIAGE: 0, ASSIGNED: 0, RESOLVED: 0 },
+  });
 });
 
 it("matches the spec for status changes and history", async () => {
@@ -151,6 +157,9 @@ it("matches the spec for status changes and history", async () => {
     "patch",
     "/api/cases/{id}/status",
   );
+  expect(
+    (await request(app).get("/api/cases/summary")).body.data.byStatus,
+  ).toMatchObject({ OPEN: 0, TRIAGE: 1 });
   const history = await request(app).get(`/api/cases/${caseId}/history`);
   expectContract(history, "get", "/api/cases/{id}/history");
   expect(history.body.data).toHaveLength(2);
