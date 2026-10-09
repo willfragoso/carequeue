@@ -185,14 +185,15 @@ async function seedCase(item: Seed, now: number) {
       at(moments[index]),
     ]);
 
-  // Pretend the event already went through the broker and the worker.
+  // Pretend the event already went through the broker and the worker. A running
+  // publisher/worker may already have handled it, so overwrite instead of failing.
   const published = openedAt + 400;
   const event = await pool.query(
     "UPDATE outbox SET created_at=$2, published_at=$3 WHERE envelope->'payload'->>'caseId'=$1 RETURNING event_id AS \"eventId\"",
     [created.id, at(openedAt), at(published)],
   );
   await pool.query(
-    "INSERT INTO notifications(id,event_id,case_id,created_at) VALUES($1,$2,$3,$4)",
+    "INSERT INTO notifications(id,event_id,case_id,created_at) VALUES($1,$2,$3,$4) ON CONFLICT(event_id) DO UPDATE SET created_at=EXCLUDED.created_at",
     [randomUUID(), event.rows[0].eventId, created.id, at(published + 900)],
   );
 }
