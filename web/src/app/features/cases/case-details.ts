@@ -23,13 +23,14 @@ import {
 import { remote } from "../../core/remote";
 import { CopyId } from "../../shared/copy-id";
 import { ErrorNotice } from "../../shared/error-notice";
+import { Icon } from "../../shared/icon";
 import { StatusBadge } from "../../shared/status-badge";
 import { TimePipe } from "../../shared/time.pipe";
 import { DeliveryFlow } from "../flow/delivery-flow";
 
 @Component({
   selector: "cq-case-details",
-  imports: [CopyId, DeliveryFlow, ErrorNotice, StatusBadge, TimePipe],
+  imports: [CopyId, DeliveryFlow, ErrorNotice, Icon, StatusBadge, TimePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./case-details.html",
 })

@@ -1,9 +1,6 @@
 <dialog #dialog class="new-case-dialog" (cancel)="cancel($event)">
   <div class="dialog-heading">
-    <div>
-      <span class="eyebrow">DADOS SINTÉTICOS</span>
-      <h2>Nova solicitação</h2>
-    </div>
+    <h2>Nova solicitação</h2>
     <button
       type="button"
       class="icon-button"
@@ -11,10 +8,13 @@
       [disabled]="busy()"
       (click)="closed.emit()"
     >
-      ×
+      <cq-icon name="x" />
     </button>
   </div>
-  <p>Crie um atendimento fictício e acompanhe cada etapa da entrega.</p>
+  <p>
+    Descreva o atendimento. A solicitação entra na fila como Aberta e o evento
+    de criação é publicado em segundo plano.
+  </p>
   <form (submit)="submit($event)">
     <label>
       Título
@@ -24,7 +24,7 @@
         maxlength="120"
         [value]="title()"
         (input)="title.set(text($event))"
-        placeholder="Ex.: Acompanhamento fictício A"
+        placeholder="Ex.: Erro ao gerar segunda via de boleto"
         [disabled]="busy()"
       />
     </label>
@@ -36,13 +36,11 @@
         rows="4"
         [value]="description()"
         (input)="description.set(text($event))"
-        placeholder="Descreva apenas uma situação inventada."
+        placeholder="Explique o que aconteceu, o que era esperado e o que já foi tentado."
         [disabled]="busy()"
       ></textarea>
     </label>
-    <div class="synthetic-note">
-      Use somente informações inventadas. Nenhum contato externo será feito.
-    </div>
+    <p class="form-hint">Não inclua dados pessoais ou sensíveis.</p>
     <cq-error-notice [error]="error()" />
     <div class="dialog-actions">
       <button

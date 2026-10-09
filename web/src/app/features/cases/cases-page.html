@@ -1,118 +1,181 @@
 <div class="cases-grid">
-  <section class="panel cases-panel">
-    <div class="panel-heading">
-      <div>
-        <h2>Solicitações</h2>
-        <p>A operação em andamento, com status e histórico.</p>
-      </div>
-      <label class="filter-label">
-        Status
-        <select
-          aria-label="Filtrar por status"
-          (change)="store.setFilter(value($event))"
+  <section class="panel cases-panel" aria-label="Lista de solicitações">
+    <div class="list-toolbar">
+      <div class="segmented" role="group" aria-label="Filtrar por status">
+        <button
+          type="button"
+          [attr.aria-pressed]="!store.filter()"
+          (click)="store.setFilter('')"
         >
-          <option value="" [selected]="!store.filter()">Todos os status</option>
-          @for (status of statuses; track status) {
-          <option [value]="status" [selected]="store.filter() === status">
-            {{ labels[status] }}
-          </option>
-          }
-        </select>
-      </label>
+          Todas
+          <span class="count">{{
+            store.summary.data()?.data?.total ?? "–"
+          }}</span>
+        </button>
+        @for (status of statuses; track status) {
+          <button
+            type="button"
+            [attr.aria-pressed]="store.filter() === status"
+            (click)="store.setFilter(status)"
+          >
+            {{ groupLabels[status] }}
+            <span class="count">{{
+              store.summary.data()?.data?.byStatus?.[status] ?? "–"
+            }}</span>
+          </button>
+        }
+      </div>
     </div>
     <cq-error-notice [error]="store.cases.error()" />
     <div class="table-scroll">
       <table>
+        <caption class="sr-only">
+          Solicitações, da mais recente para a mais antiga
+        </caption>
         <thead>
           <tr>
             <th>Solicitação</th>
             <th>Status</th>
-            <th>Criada em</th>
+            <th class="col-created">Criada <cq-icon name="arrow-down" /></th>
           </tr>
         </thead>
         <tbody>
-          @for (item of store.cases.data()?.data ?? []; track item.id) {
-          <tr [class]="store.selectedId() === item.id ? 'selected' : ''">
-            <td>
-              <button
-                class="case-link"
-                [attr.aria-pressed]="store.selectedId() === item.id"
-                (click)="store.select(item.id)"
-              >
-                {{ item.title }}
-                <small>{{ item.id.slice(0, 8).toUpperCase() }}</small>
-              </button>
-            </td>
-            <td><cq-status-badge [status]="item.status" /></td>
-            <td>
-              <time>{{ item.createdAt | cqTime }}</time>
-            </td>
-          </tr>
+          @for (item of store.rows(); track item.id) {
+            <tr
+              [class.selected]="store.selectedId() === item.id"
+              (click)="store.select(item.id)"
+            >
+              <td>
+                <button
+                  class="case-link"
+                  [attr.aria-pressed]="store.selectedId() === item.id"
+                  (click)="store.select(item.id); $event.stopPropagation()"
+                >
+                  <span class="case-title">{{ item.title }}</span>
+                  <small>#{{ item.id.slice(0, 8).toUpperCase() }}</small>
+                </button>
+              </td>
+              <td><cq-status-badge [status]="item.status" /></td>
+              <td class="col-created">
+                <time
+                  [attr.datetime]="item.createdAt"
+                  [title]="item.createdAt | cqTime"
+                  >{{ item.createdAt | cqAgo }}</time
+                >
+              </td>
+            </tr>
           }
         </tbody>
       </table>
     </div>
     @if (store.cases.loading()) {
-    <p class="empty-state">Carregando solicitações…</p>
-    } @else if (store.cases.data()?.data.length === 0) {
-    <div class="empty-state">
-      <span class="empty-icon">＋</span>
-      <h3>
-        {{ store.filter() ? "Nenhuma solicitação neste status" : "A operação
-        começa com uma solicitação" }}
-      </h3>
-      <p>Crie um exemplo sintético para explorar o fluxo.</p>
-      <button class="secondary" (click)="store.showNew.set(true)">
-        Criar primeiro exemplo
-      </button>
-    </div>
+      <p class="empty-state">Carregando solicitações…</p>
+    } @else if (store.cases.data()?.data?.length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon"><cq-icon name="inbox" /></span>
+        <h3>
+          {{
+            store.filter()
+              ? "Nenhuma solicitação neste status"
+              : "A fila está vazia"
+          }}
+        </h3>
+        <p>
+          {{
+            store.filter()
+              ? "Escolha outro status ou veja todas as solicitações."
+              : "Crie a primeira solicitação para acompanhar o fluxo completo."
+          }}
+        </p>
+        @if (store.filter()) {
+          <button class="secondary" (click)="store.setFilter('')">
+            Ver todas
+          </button>
+        } @else {
+          <button class="secondary" (click)="store.showNew.set(true)">
+            Criar solicitação
+          </button>
+        }
+      </div>
     }
     <div class="table-footer">
-      <span>
-        {{ store.cases.data()?.data.length ?? 0 }} nesta página · atualização a
-        cada 3 s
-      </span>
-      <div>
-        <button
-          class="pagination-button"
-          aria-label="Página anterior"
-          [disabled]="!store.previous().length || store.cases.loading()"
-          (click)="store.previousPage()"
-        >
-          ←
-        </button>
-        <button
-          class="pagination-button"
-          aria-label="Próxima página"
-          [disabled]="
-            !store.cases.data()?.pagination.nextCursor || store.cases.loading()
-          "
-          (click)="store.nextPage()"
-        >
-          →
-        </button>
+      <p class="range" aria-live="polite">
+        @if (store.rows().length) {
+          Exibindo <b>{{ store.rangeStart() }}–{{ store.rangeEnd() }}</b>
+          @if (store.total() !== null) {
+            de <b>{{ store.total() }}</b>
+          }
+        } @else {
+          Nenhum resultado
+        }
+      </p>
+      <div class="pager">
+        <label class="page-size">
+          Por página
+          <select
+            aria-label="Itens por página"
+            (change)="store.setPageSize(size($event))"
+          >
+            @for (option of pageSizes; track option) {
+              <option [value]="option" [selected]="store.pageSize() === option">
+                {{ option }}
+              </option>
+            }
+          </select>
+        </label>
+        <div class="pager-buttons">
+          <button
+            class="pagination-button"
+            aria-label="Primeira página"
+            [disabled]="!store.hasPrevious() || store.cases.loading()"
+            (click)="store.firstPage()"
+          >
+            <cq-icon name="chevrons-left" />
+          </button>
+          <button
+            class="pagination-button"
+            aria-label="Página anterior"
+            [disabled]="!store.hasPrevious() || store.cases.loading()"
+            (click)="store.previousPage()"
+          >
+            <cq-icon name="chevron-left" />
+          </button>
+          <span class="page-indicator">
+            Página <b>{{ store.pageIndex() + 1 }}</b>
+            @if (store.pageCount() !== null) {
+              de <b>{{ store.pageCount() }}</b>
+            }
+          </span>
+          <button
+            class="pagination-button"
+            aria-label="Próxima página"
+            [disabled]="!store.hasNext() || store.cases.loading()"
+            (click)="store.nextPage()"
+          >
+            <cq-icon name="chevron-right" />
+          </button>
+        </div>
       </div>
     </div>
   </section>
   @if (store.selectedId(); as id) {
-  <cq-case-details [id]="id" (changed)="store.caseChanged()" />
+    <cq-case-details [id]="id" (changed)="store.caseChanged()" />
   } @else {
-  <aside class="panel selection-empty">
-    <span class="empty-icon">↗</span>
-    <span class="eyebrow">FLUXO DO PRODUTO</span>
-    <h2>Selecione uma solicitação para trabalhar nela.</h2>
-    <p>
-      Veja o histórico e avance o status conforme a solicitação passa pela
-      triagem.
-    </p>
-    <div class="mini-flow">
-      <span>Aberta</span>
-      <i>→</i>
-      <span>Triagem</span>
-      <i>→</i>
-      <span>Resolvida</span>
-    </div>
-    <small>A arquitetura fica na aba dedicada.</small>
-  </aside>
+    <aside class="panel selection-empty">
+      <span class="empty-icon"><cq-icon name="arrow-up-right" /></span>
+      <h2>Selecione uma solicitação</h2>
+      <p>
+        Veja o histórico e avance o status conforme a solicitação passa pela
+        triagem.
+      </p>
+      <div class="mini-flow">
+        @for (status of statuses; track status; let last = $last) {
+          <span>{{ labels[status] }}</span>
+          @if (!last) {
+            <i><cq-icon name="arrow-right" /></i>
+          }
+        }
+      </div>
+    </aside>
   }
 </div>

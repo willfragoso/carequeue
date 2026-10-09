@@ -152,6 +152,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/cases/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Count cases by status */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["CaseSummary"];
+                        };
+                    };
+                };
+                /** @description Error */
+                500: {
+                    headers: {
+                        "x-correlation-id": components["headers"]["CorrelationId"];
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/cases/{id}": {
         parameters: {
             query?: never;
@@ -762,6 +811,16 @@ export interface components {
                 consumers: number | null;
                 retryReady: number | null;
                 deadLetters: number | null;
+            };
+        };
+        CaseSummary: {
+            /** @description All cases, regardless of status */
+            total: number;
+            byStatus: {
+                OPEN: number;
+                TRIAGE: number;
+                ASSIGNED: number;
+                RESOLVED: number;
             };
         };
     };
