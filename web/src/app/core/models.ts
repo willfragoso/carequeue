@@ -5,6 +5,7 @@ type Schemas = components["schemas"];
 export type Status = Schemas["Status"];
 export type Case = Schemas["Case"];
 export type CaseList = Schemas["CaseListCursor"];
+export type CaseSummary = Schemas["CaseSummary"];
 export type History = Schemas["HistoryEntry"];
 export type Notification = Schemas["Notification"];
 export type Delivery = Schemas["Delivery"];
@@ -19,6 +20,13 @@ export const labels: Record<Status, string> = {
   TRIAGE: "Em triagem",
   ASSIGNED: "Atribuída",
   RESOLVED: "Resolvida",
+};
+// Plural form, used where the status names a group of cases (filters).
+export const groupLabels: Record<Status, string> = {
+  OPEN: "Abertas",
+  TRIAGE: "Em triagem",
+  ASSIGNED: "Atribuídas",
+  RESOLVED: "Resolvidas",
 };
 export const statuses = Object.keys(labels) as Status[];
 export const nextStatus: Record<Status, Status | null> = {

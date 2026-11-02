@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import type { Data, Delivery } from "../../core/models";
 import { remote } from "../../core/remote";
 import { WorkspaceStore } from "../../core/workspace-store";
+import { Icon } from "../../shared/icon";
 import { CaseDetails } from "../cases/case-details";
 import { ArchitectureCanvas } from "./architecture-canvas";
 
 @Component({
   selector: "cq-flow-page",
-  imports: [ArchitectureCanvas, CaseDetails],
+  imports: [ArchitectureCanvas, CaseDetails, Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./flow-page.html",
 })

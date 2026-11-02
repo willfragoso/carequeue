@@ -9,6 +9,7 @@ import {
   getCase,
   listCases,
   listCasesCursor,
+  summarizeCases,
   changeStatus,
   history,
   notifications,
@@ -91,6 +92,10 @@ export function createApp() {
         : await listCases(query.status, query.page ?? 1, query.pageSize),
     );
   });
+  // Registered before /api/cases/:id so "summary" is not parsed as a case ID.
+  app.get("/api/cases/summary", async (_req, res) =>
+    res.json({ data: await summarizeCases() }),
+  );
   app.get("/api/operations", async (_req, res) =>
     res.json({ data: await operations() }),
   );

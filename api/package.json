@@ -18,7 +18,8 @@
     "start": "node dist/src/entrypoints/api.js",
     "publisher": "node dist/src/entrypoints/publisher.js",
     "worker": "node dist/src/entrypoints/worker.js",
-    "migrate": "node dist/src/entrypoints/migrate.js"
+    "migrate": "node dist/src/entrypoints/migrate.js",
+    "seed": "node dist/src/entrypoints/seed.js"
   },
   "dependencies": {
     "amqplib": "^2.2.0",

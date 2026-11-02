@@ -18,11 +18,13 @@ import { views, type ViewId } from "./core/views";
 import { NewCaseDialog } from "./features/cases/new-case-dialog";
 import { Metrics } from "./features/flow/metrics";
 import { ErrorNotice } from "./shared/error-notice";
+import { Icon } from "./shared/icon";
 
 @Component({
   selector: "cq-root",
   imports: [
     ErrorNotice,
+    Icon,
     Metrics,
     NewCaseDialog,
     RouterLink,

@@ -70,6 +70,20 @@ export async function listCases(
   );
   return { data: result.rows, pagination: { page, pageSize } };
 }
+export async function summarizeCases() {
+  const result = await pool.query(
+    "SELECT status, count(*)::int AS count FROM cases GROUP BY status",
+  );
+  const byStatus: Record<Status, number> = {
+    OPEN: 0,
+    TRIAGE: 0,
+    ASSIGNED: 0,
+    RESOLVED: 0,
+  };
+  for (const row of result.rows) byStatus[row.status as Status] = row.count;
+  const total = Object.values(byStatus).reduce((sum, count) => sum + count, 0);
+  return { total, byStatus };
+}
 export async function changeStatus(
   id: string,
   status: Status,

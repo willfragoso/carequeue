@@ -2,41 +2,233 @@
   <section class="panel systems-map-panel">
     <div class="panel-kicker">MAPA DOS SISTEMAS</div>
     <h2>Componentes que executam a demonstração.</h2>
-    <div class="systems-board" aria-label="Diagrama dos sistemas CareQueue">
-      <svg
-        class="systems-lines"
-        viewBox="0 0 1000 430"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <defs>
-          <marker
-            id="arrowhead"
-            markerHeight="8"
-            markerWidth="8"
-            orient="auto"
-            refX="7"
-            refY="4"
-          >
-            <path d="M0,0 L8,4 L0,8 Z" />
-          </marker>
-        </defs>
-        <path d="M220 218 H350" />
-        <path d="M553 170 H678" />
-        <path d="M553 250 H678" />
-        <path d="M827 166 H895" />
-        <path d="M827 316 H895" />
-        <path d="M752 366 V430 H448" />
-        <path d="M445 368 V430 H130 V282" />
-      </svg>
-      <div class="systems-zone zone-client">
+
+    <svg
+      class="systems-diagram"
+      viewBox="0 0 960 540"
+      role="img"
+      aria-label="Diagrama dos sistemas CareQueue"
+    >
+      <defs>
+        <marker
+          id="arrowhead"
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto"
+        >
+          <path class="map-arrow" d="M0 0 L10 5 L0 10 z" />
+        </marker>
+      </defs>
+
+      <rect class="map-zone" x="20" y="190" width="210" height="160" rx="12" />
+      <text class="map-zone-label" x="36" y="214">USUÁRIO</text>
+      <rect class="map-zone" x="320" y="30" width="320" height="480" rx="12" />
+      <text class="map-zone-label" x="340" y="56">APLICAÇÃO NODE.JS</text>
+      <rect class="map-zone" x="730" y="70" width="210" height="170" rx="12" />
+      <text class="map-zone-label" x="746" y="94">PERSISTÊNCIA</text>
+      <rect class="map-zone" x="730" y="300" width="210" height="170" rx="12" />
+      <text class="map-zone-label" x="746" y="324">MENSAGERIA</text>
+
+      <path
+        class="map-line"
+        d="M214 276 H270 V124 H340"
+        marker-end="url(#arrowhead)"
+      />
+      <path class="map-line" d="M620 140 H746" marker-end="url(#arrowhead)" />
+      <path
+        class="map-line"
+        d="M746 190 H690 V240 H620"
+        marker-end="url(#arrowhead)"
+      />
+      <path
+        class="map-line"
+        d="M620 296 H700 V366 H746"
+        marker-end="url(#arrowhead)"
+      />
+      <path class="map-line" d="M746 420 H620" marker-end="url(#arrowhead)" />
+      <path
+        class="map-line"
+        d="M480 466 V500 H952 V161 H924"
+        marker-end="url(#arrowhead)"
+      />
+
+      <g class="map-card accent-teal">
+        <rect
+          class="map-card-bg"
+          x="36"
+          y="226"
+          width="178"
+          height="100"
+          rx="8"
+        />
+        <rect
+          class="map-card-accent"
+          x="36"
+          y="226"
+          width="5"
+          height="100"
+          rx="2"
+        />
+        <text class="map-card-title" x="56" y="256">Angular console</text>
+        <text class="map-card-desc" x="56" y="282">
+          <tspan x="56">Solicitações, mapa, fluxo</tspan>
+          <tspan x="56" dy="18">e glossário no navegador.</tspan>
+        </text>
+      </g>
+      <g class="map-card accent-blue">
+        <rect
+          class="map-card-bg"
+          x="340"
+          y="70"
+          width="280"
+          height="108"
+          rx="8"
+        />
+        <rect
+          class="map-card-accent"
+          x="340"
+          y="70"
+          width="5"
+          height="108"
+          rx="2"
+        />
+        <text class="map-card-title" x="362" y="102">Express API</text>
+        <text class="map-card-desc" x="362" y="128">
+          <tspan x="362">Validação HTTP, regras de</tspan>
+          <tspan x="362" dy="18">status e correlationId.</tspan>
+        </text>
+      </g>
+      <g class="map-card accent-purple">
+        <rect
+          class="map-card-bg"
+          x="340"
+          y="214"
+          width="280"
+          height="108"
+          rx="8"
+        />
+        <rect
+          class="map-card-accent"
+          x="340"
+          y="214"
+          width="5"
+          height="108"
+          rx="2"
+        />
+        <text class="map-card-title" x="362" y="246">Outbox publisher</text>
+        <text class="map-card-desc" x="362" y="272">
+          <tspan x="362">Lê eventos pendentes e</tspan>
+          <tspan x="362" dy="18">publica com confirmação.</tspan>
+        </text>
+      </g>
+      <g class="map-card accent-orange">
+        <rect
+          class="map-card-bg"
+          x="340"
+          y="358"
+          width="280"
+          height="108"
+          rx="8"
+        />
+        <rect
+          class="map-card-accent"
+          x="340"
+          y="358"
+          width="5"
+          height="108"
+          rx="2"
+        />
+        <text class="map-card-title" x="362" y="390">Worker</text>
+        <text class="map-card-desc" x="362" y="416">
+          <tspan x="362">Consome eventos e salva a</tspan>
+          <tspan x="362" dy="18">notificação simulada.</tspan>
+        </text>
+      </g>
+      <g class="map-card accent-green">
+        <rect
+          class="map-card-bg"
+          x="746"
+          y="106"
+          width="178"
+          height="110"
+          rx="8"
+        />
+        <rect
+          class="map-card-accent"
+          x="746"
+          y="106"
+          width="5"
+          height="110"
+          rx="2"
+        />
+        <text class="map-card-title" x="766" y="138">PostgreSQL</text>
+        <text class="map-card-desc" x="766" y="164">
+          <tspan x="766">Casos, histórico, outbox</tspan>
+          <tspan x="766" dy="18">e notificações.</tspan>
+        </text>
+      </g>
+      <g class="map-card accent-amber">
+        <rect
+          class="map-card-bg"
+          x="746"
+          y="336"
+          width="178"
+          height="110"
+          rx="8"
+        />
+        <rect
+          class="map-card-accent"
+          x="746"
+          y="336"
+          width="5"
+          height="110"
+          rx="2"
+        />
+        <text class="map-card-title" x="766" y="368">RabbitMQ</text>
+        <text class="map-card-desc" x="766" y="394">
+          <tspan x="766">Fila principal, retries</tspan>
+          <tspan x="766" dy="18">limitados e DLQ.</tspan>
+        </text>
+      </g>
+
+      <g class="map-step" transform="translate(270 200)">
+        <circle r="11" />
+        <text>1</text>
+      </g>
+      <g class="map-step" transform="translate(683 140)">
+        <circle r="11" />
+        <text>2</text>
+      </g>
+      <g class="map-step" transform="translate(690 215)">
+        <circle r="11" />
+        <text>3</text>
+      </g>
+      <g class="map-step" transform="translate(700 331)">
+        <circle r="11" />
+        <text>4</text>
+      </g>
+      <g class="map-step" transform="translate(683 420)">
+        <circle r="11" />
+        <text>5</text>
+      </g>
+      <g class="map-step" transform="translate(700 500)">
+        <circle r="11" />
+        <text>6</text>
+      </g>
+    </svg>
+
+    <div class="systems-stack">
+      <div class="systems-zone">
         <span>Usuário</span>
         <article class="system-card accent-teal">
           <b>Angular console</b>
           <small>Solicitações, mapa, fluxo e glossário no navegador.</small>
         </article>
       </div>
-      <div class="systems-zone zone-api">
+      <div class="systems-zone">
         <span>Aplicação Node.js</span>
         <article class="system-card accent-blue">
           <b>Express API</b>
@@ -51,26 +243,33 @@
           <small>Consome eventos e salva a notificação simulada.</small>
         </article>
       </div>
-      <div class="systems-zone zone-data">
+      <div class="systems-zone">
         <span>Persistência</span>
         <article class="system-card accent-green">
           <b>PostgreSQL</b>
-          <small>Cases, histórico, outbox e notificações.</small>
+          <small>Casos, histórico, outbox e notificações.</small>
         </article>
       </div>
-      <div class="systems-zone zone-broker">
+      <div class="systems-zone">
         <span>Mensageria</span>
         <article class="system-card accent-amber">
           <b>RabbitMQ</b>
           <small>Fila principal, retries limitados e DLQ.</small>
         </article>
       </div>
-      <ol class="systems-legend" aria-label="Legenda do mapa">
-        <li><span>1</span> Console chama a API.</li>
-        <li><span>2</span> API grava dados e evento na mesma transação.</li>
-        <li><span>3</span> Publisher envia o evento para o broker.</li>
-        <li><span>4</span> Worker processa com idempotência.</li>
-      </ol>
     </div>
+
+    <ol class="systems-legend" aria-label="Legenda do mapa">
+      <li><span>1</span> O console chama a API por HTTP.</li>
+      <li><span>2</span> A API grava o caso e o evento na mesma transação.</li>
+      <li><span>3</span> O publisher lê os eventos pendentes da outbox.</li>
+      <li>
+        <span>4</span> O publisher envia ao RabbitMQ e espera a confirmação.
+      </li>
+      <li><span>5</span> O RabbitMQ entrega a mensagem ao worker.</li>
+      <li>
+        <span>6</span> O worker salva a notificação, de forma idempotente.
+      </li>
+    </ol>
   </section>
 </div>

@@ -111,6 +111,7 @@ The full [OpenAPI 3.1 specification](api/openapi.json) includes all routes. Resp
 | ------ | ----------------------------------------- | ------------------------------------------- |
 | POST   | /api/cases                                | 201; case, initial history and outbox event |
 | GET    | /api/cases?status=OPEN&page=1&pageSize=20 | Cases and pagination                        |
+| GET    | /api/cases/summary                        | Total and count per status                  |
 | GET    | /api/cases/:id                            | Case or 404                                 |
 | PATCH  | /api/cases/:id/status                     | Adjacent transition or 409                  |
 | GET    | /api/cases/:id/history                    | Status changes                              |
@@ -252,11 +253,24 @@ GET /api/cases/:id/delivery exposes eventId, correlationId, timestamps and the d
 
 GET /api/cases?pagination=cursor&pageSize=20 returns pagination.nextCursor. Supply it as cursor on the next request, keeping the same status filter. A null nextCursor marks the end. Newer inserts do not shift later pages. The legacy page parameter remains available with pagination=offset (default), but cannot be mixed with cursor mode.
 
+## Sample data
+
+An empty queue is hard to understand, so the project ships a seed command that fills the database with 16 realistic support cases (billing, access, delivery, integrations) in every status, with backdated timestamps, status history and completed notification delivery:
+
+```sh
+# Compose stack: replaces whatever is in the demo database
+docker compose exec api node dist/src/entrypoints/seed.js --reset
+# Host development (DATABASE_URL set, API built)
+pnpm seed --reset
+```
+
+Without `--reset` the command refuses to run when the database already has cases. `--reset` truncates the application tables first, so use it only on a disposable or demo database.
+
 ## Demonstration frontend
 
 The Angular + TypeScript console (standalone components, signals, zoneless change detection, lazy-loaded routes) is available at **http://localhost:8080** after `docker compose up --build -d`. It shares the API origin through an Nginx proxy; the browser receives no database/broker credentials. All displayed delivery states and queue counts come from API responses, not timers or mock data.
 
-- **Solicitações**: product view for synthetic cases, filtering, cursor pagination, adjacent status transitions and status history.
+- **Solicitações**: the case queue. Status filters with live counts, a dense table with relative times, a details panel with the status history, and full pagination (first/previous/next, page `X of Y`, `11–20 of 23`, 10/20/50 per page). The first case is selected automatically on wide screens. Counts and totals come from `GET /api/cases/summary`.
 - **Mapa**: diagram of the running systems (console, API, publisher, worker, PostgreSQL, RabbitMQ).
 - **Fluxo**: technical view for pending outbox events, RabbitMQ status, retry queues, DLQ counts and the stop/create/restart/replay walkthrough.
 - **Glossário**: beginner glossary of the project terms.
@@ -292,7 +306,7 @@ $env:E2E_BROWSER_CHANNEL='chrome'
 pnpm test:e2e
 ```
 
-Browser tests create synthetic cases in the local demo database; run them only against a demo environment. The workflow has an isolated E2E job that builds the entire Compose stack and runs Chromium tests. Tests cover creation, all status transitions, saved notifications, history, displayed errors and mobile layout. One browser test explicitly intercepts an HTTP response to verify error presentation; the main workflow and backend integration tests use real services.
+Browser tests create cases in the local demo database (the pagination test only creates what it needs to reach two pages); run them only against a demo environment and restore the realistic data afterwards with the seed command below. The workflow has an isolated E2E job that builds the entire Compose stack and runs Chromium tests. Tests cover creation, all status transitions, saved notifications, history, displayed errors and mobile layout. One browser test explicitly intercepts an HTTP response to verify error presentation; the main workflow and backend integration tests use real services.
 
 Actual failure demonstration through the UI:
 

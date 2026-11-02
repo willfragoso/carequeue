@@ -5,19 +5,24 @@ import {
   input,
 } from "@angular/core";
 import type { Delivery } from "../../core/models";
+import { Icon } from "../../shared/icon";
 import { TimePipe } from "../../shared/time.pipe";
 
 @Component({
   selector: "cq-delivery-flow",
-  imports: [TimePipe],
+  imports: [Icon, TimePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="delivery-flow" aria-label="Progresso da entrega">
       @for (step of steps(); track step.label; let index = $index) {
         <div [class]="stage() > index ? 'flow-step complete' : 'flow-step'">
-          <span class="flow-number">{{
-            stage() > index ? "✓" : index + 1
-          }}</span>
+          <span class="flow-number">
+            @if (stage() > index) {
+              <cq-icon name="check" />
+            } @else {
+              {{ index + 1 }}
+            }
+          </span>
           <strong>{{ step.label }}</strong>
           <small>{{ step.at ? (step.at | cqTime) : step.detail }}</small>
         </div>

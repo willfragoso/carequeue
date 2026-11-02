@@ -1,3 +1,4 @@
+import { Icon } from "./icon";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -7,6 +8,7 @@ import {
 
 @Component({
   selector: "cq-copy-id",
+  imports: [Icon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="identifier">
@@ -19,7 +21,9 @@ import {
           [attr.aria-label]="'Copiar ' + label()"
           (click)="copy()"
         >
-          {{ copied() ? "Copiado" : "Copiar" }}
+          <cq-icon [name]="copied() ? 'check' : 'copy'" />{{
+            copied() ? "Copiado" : "Copiar"
+          }}
         </button>
       </div>
     </div>

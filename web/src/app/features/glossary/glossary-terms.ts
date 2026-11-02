@@ -16,13 +16,13 @@ export const glossaryTerms: GlossaryTerm[] = [
     plain:
       "A parte do sistema que roda no servidor e cuida das regras, dados e integrações.",
     context:
-      "Este projeto mostra o backend por trás de uma fila fictícia de atendimento.",
+      "Este projeto mostra o backend por trás de uma fila de atendimento.",
   },
   {
     term: "Frontend",
     plain: "A tela que a pessoa usa no navegador para interagir com o sistema.",
     context:
-      "Aqui ele serve para criar solicitações, ver a arquitetura e testar falhas.",
+      "Aqui ele serve para criar solicitações, ver a arquitetura do sistema e testar falhas.",
   },
   {
     term: "PostgreSQL",
@@ -124,7 +124,7 @@ export const glossaryTerms: GlossaryTerm[] = [
     term: "DLQ",
     plain: "Abreviação de dead-letter queue.",
     context:
-      "Na tela de Arquitetura, ela mostra mensagens que não conseguiram ser processadas.",
+      "Na tela de Fluxo, ela mostra mensagens que não conseguiram ser processadas.",
   },
   {
     term: "correlationId",

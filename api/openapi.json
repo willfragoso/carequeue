@@ -253,6 +253,49 @@
         }
       }
     },
+    "/api/cases/summary": {
+      "get": {
+        "summary": "Count cases by status",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data"],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CaseSummary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "headers": {
+              "x-correlation-id": {
+                "$ref": "#/components/headers/CorrelationId"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/cases/{id}": {
       "get": {
         "summary": "Get a case",
@@ -1122,6 +1165,40 @@
           "outbox",
           "broker"
         ]
+      },
+      "CaseSummary": {
+        "type": "object",
+        "required": ["total", "byStatus"],
+        "properties": {
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "All cases, regardless of status"
+          },
+          "byStatus": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["OPEN", "TRIAGE", "ASSIGNED", "RESOLVED"],
+            "properties": {
+              "OPEN": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "TRIAGE": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "ASSIGNED": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "RESOLVED": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
       }
     },
     "headers": {
